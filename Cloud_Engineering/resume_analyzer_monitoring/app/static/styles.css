@@ -1,0 +1,76 @@
+body {
+    background: #f5f7fb;
+}
+
+.app-wrapper {
+    min-height: 100vh;
+}
+
+.hero-badge {
+    display: inline-block;
+    background: #e8f0ff;
+    color: #0d6efd;
+    padding: 0.45rem 0.9rem;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.hero-subtitle {
+    max-width: 760px;
+}
+
+.app-card {
+    border: 0;
+    border-radius: 18px;
+}
+
+.custom-textarea {
+    border-radius: 14px;
+    resize: none;
+}
+
+.analyze-btn {
+    border-radius: 999px;
+    font-weight: 600;
+}
+
+.score-text {
+    font-size: 3rem;
+    font-weight: 700;
+}
+
+.custom-progress {
+    height: 12px;
+    border-radius: 999px;
+}
+
+.progress-bar {
+    border-radius: 999px;
+}
+
+.custom-card-header {
+    background: #ffffff;
+    font-weight: 700;
+    border-bottom: 1px solid #eef0f4;
+    padding: 1rem 1.25rem;
+}
+
+.skill-badge {
+    font-size: 0.9rem;
+    padding: 0.65rem 0.85rem;
+    margin: 0.25rem;
+    border-radius: 999px;
+}
+
+.matched-badge {
+    background: #198754;
+}
+
+.missing-badge {
+    background: #dc3545;
+}
+
+.recommendation-card {
+    border-left: 5px solid #0d6efd;
+}
