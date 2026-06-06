@@ -1,12 +1,10 @@
-# Changelog
-
 All notable changes to this project will be documented in this file.
 
-The format is based on Keep a Changelog and this project adheres to Semantic Versioning principles where applicable.
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project adheres to Semantic Versioning principles where applicable.
 
-## [0.1.0] - 2026-06-06
+---
 
-### Added
+### ✨ Added [0.1.0] - 2026-06-06
 
 * Initial repository structure.
 * Portfolio README documentation.
@@ -17,6 +15,3 @@ The format is based on Keep a Changelog and this project adheres to Semantic Ver
 * Technology stack and learning roadmap documentation.
 * CHANGELOG.md for tracking repository updates.
 
----
-
-[Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
