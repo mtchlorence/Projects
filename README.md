@@ -18,7 +18,7 @@ My goal is to build practical solutions while expanding my expertise in AWS, aut
 *Coming Soon*
 
 ### 🧠 AI & Automation
-*Coming Soon*
+- 🗓️ Smart Study Session Planner
 
 ## 🛠️ Technologies & Tools
 

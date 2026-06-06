@@ -4,8 +4,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 
 ---
 
-### ✨ Added [0.1.0] - 2026-06-06
+### ✨ Added [0.2.0] - 2026-06-06
+- Smart Study Session Planner AI application built with AWS PartyRock.
+- AI & Automation project category.
 
+### ✨ Added [0.1.0] - 2026-06-06
 * Initial repository structure.
 * Portfolio README documentation.
 * Cost of Living Index by Country data analysis project.
