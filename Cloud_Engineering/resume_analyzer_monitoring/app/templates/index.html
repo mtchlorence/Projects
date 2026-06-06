@@ -5,273 +5,268 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Resume Skill Analyzer</title>
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
 
-```
-<link
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-    rel="stylesheet"
->
-
-<link
-    rel="stylesheet"
-    href="{{ url_for('static', filename='css/styles.css') }}"
->
-```
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/styles.css') }}"
+    >
 
 </head>
 
 <body>
 
-<div class="app-wrapper">
+    <div class="app-wrapper">
 
-```
-<div class="container py-5">
+        <div class="container py-5">
 
-    <!-- Header -->
-    <section class="hero-section text-center mb-5">
-        <span class="hero-badge">
-            DevOps + AI Portfolio Project
-        </span>
+            <!-- Header -->
+            <section class="hero-section text-center mb-5">
+                <span class="hero-badge">
+                    DevOps + AI Portfolio Project
+                </span>
 
-        <h1 class="display-5 fw-bold mt-3">
-            🧠 Resume Skill Analyzer
-        </h1>
+                <h1 class="display-5 fw-bold mt-3">
+                    🧠 Resume Skill Analyzer
+                </h1>
 
-        <p class="lead text-muted mx-auto hero-subtitle">
-            Compare your resume against a job description, identify matched skills,
-            detect missing skills, and generate a quick fit recommendation.
-        </p>
-    </section>
+                <p class="lead text-muted mx-auto hero-subtitle">
+                    Compare your resume against a job description, identify matched skills,
+                    detect missing skills, and generate a quick fit recommendation.
+                </p>
+            </section>
 
-    <!-- Form -->
-    <section class="card app-card shadow-sm mb-4">
-        <div class="card-body p-4">
+            <!-- Form -->
+            <section class="card app-card shadow-sm mb-4">
+                <div class="card-body p-4">
 
-            <form action="/analyze" method="POST">
+                    <form action="/analyze" method="POST">
 
-                <div class="row g-4">
+                        <div class="row g-4">
 
-                    <div class="col-lg-6">
-                        <label class="form-label fw-semibold">
-                            Resume
-                        </label>
+                            <div class="col-lg-6">
+                                <label class="form-label fw-semibold">
+                                    Resume
+                                </label>
 
-                        <textarea
-                            class="form-control custom-textarea"
-                            name="resume"
-                            rows="12"
-                            placeholder="Paste resume content here..."
-                        >{{ resume if resume else '' }}</textarea>
-                    </div>
-
-                    <div class="col-lg-6">
-                        <label class="form-label fw-semibold">
-                            Job Description
-                        </label>
-
-                        <textarea
-                            class="form-control custom-textarea"
-                            name="job_description"
-                            rows="12"
-                            placeholder="Paste job description here..."
-                        >{{ job_description if job_description else '' }}</textarea>
-                    </div>
-
-                </div>
-
-                <div class="text-center mt-4">
-                    <button
-                        type="submit"
-                        class="btn btn-primary btn-lg px-5 analyze-btn"
-                    >
-                        Analyze Resume
-                    </button>
-                </div>
-
-            </form>
-
-        </div>
-    </section>
-
-    <!-- Results -->
-    {% if results %}
-
-        {% set score = results.score | default(0) %}
-
-        <section class="row g-4 mb-4">
-
-            <div class="col-lg-4">
-                <div class="card app-card shadow-sm h-100">
-                    <div class="card-body text-center p-4">
-
-                        <p class="text-muted mb-1">
-                            Match Score
-                        </p>
-
-                        <h2 class="score-text mb-3">
-                            {{ score }}%
-                        </h2>
-
-                        <div class="progress custom-progress">
-                            <div
-                                class="progress-bar"
-                                role="progressbar"
-                                data-score="{{ score }}"
-                                aria-valuenow="{{ score }}"
-                                aria-valuemin="0"
-                                aria-valuemax="100"
-                            >
+                                <textarea
+                                    class="form-control custom-textarea"
+                                    name="resume"
+                                    rows="12"
+                                    placeholder="Paste resume content here..."
+                                >{{ resume if resume else '' }}</textarea>
                             </div>
+
+                            <div class="col-lg-6">
+                                <label class="form-label fw-semibold">
+                                    Job Description
+                                </label>
+
+                                <textarea
+                                    class="form-control custom-textarea"
+                                    name="job_description"
+                                    rows="12"
+                                    placeholder="Paste job description here..."
+                                >{{ job_description if job_description else '' }}</textarea>
+                            </div>
+
                         </div>
 
-                    </div>
+                        <div class="text-center mt-4">
+                            <button
+                                type="submit"
+                                class="btn btn-primary btn-lg px-5 analyze-btn"
+                            >
+                                Analyze Resume
+                            </button>
+                        </div>
+
+                    </form>
+
                 </div>
-            </div>
+            </section>
 
-            <div class="col-lg-4">
-                <div class="card app-card shadow-sm h-100">
-                    <div class="card-body text-center p-4">
+            <!-- Results -->
+            {% if results %}
 
-                        <p class="text-muted mb-1">
-                            Matched Skills
-                        </p>
+                {% set score = results.score | default(0) %}
 
-                        <h2 class="text-success mb-0">
-                            {{ results.matched_skills | length }}
-                        </h2>
+                <section class="row g-4 mb-4">
 
-                    </div>
-                </div>
-            </div>
+                    <div class="col-lg-4">
+                        <div class="card app-card shadow-sm h-100">
+                            <div class="card-body text-center p-4">
 
-            <div class="col-lg-4">
-                <div class="card app-card shadow-sm h-100">
-                    <div class="card-body text-center p-4">
+                                <p class="text-muted mb-1">
+                                    Match Score
+                                </p>
 
-                        <p class="text-muted mb-1">
-                            Missing Skills
-                        </p>
+                                <h2 class="score-text mb-3">
+                                    {{ score }}%
+                                </h2>
 
-                        <h2 class="text-danger mb-0">
-                            {{ results.missing_skills | length }}
-                        </h2>
+                                <div class="progress custom-progress">
+                                    <div
+                                        class="progress-bar"
+                                        role="progressbar"
+                                        data-score="{{ score }}"
+                                        aria-valuenow="{{ score }}"
+                                        aria-valuemin="0"
+                                        aria-valuemax="100"
+                                    >
+                                    </div>
+                                </div>
 
-                    </div>
-                </div>
-            </div>
-
-        </section>
-
-        <section class="row g-4">
-
-            <!-- Matched Skills -->
-            <div class="col-lg-6">
-                <div class="card app-card shadow-sm h-100">
-
-                    <div class="card-header custom-card-header">
-                        ✅ Matched Skills
+                            </div>
+                        </div>
                     </div>
 
+                    <div class="col-lg-4">
+                        <div class="card app-card shadow-sm h-100">
+                            <div class="card-body text-center p-4">
+
+                                <p class="text-muted mb-1">
+                                    Matched Skills
+                                </p>
+
+                                <h2 class="text-success mb-0">
+                                    {{ results.matched_skills | length }}
+                                </h2>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <div class="card app-card shadow-sm h-100">
+                            <div class="card-body text-center p-4">
+
+                                <p class="text-muted mb-1">
+                                    Missing Skills
+                                </p>
+
+                                <h2 class="text-danger mb-0">
+                                    {{ results.missing_skills | length }}
+                                </h2>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </section>
+
+                <section class="row g-4">
+
+                    <!-- Matched Skills -->
+                    <div class="col-lg-6">
+                        <div class="card app-card shadow-sm h-100">
+
+                            <div class="card-header custom-card-header">
+                                ✅ Matched Skills
+                            </div>
+
+                            <div class="card-body p-4">
+
+                                {% if results.matched_skills %}
+
+                                    {% for skill in results.matched_skills %}
+                                        <span class="badge skill-badge matched-badge">
+                                            {{ skill }}
+                                        </span>
+                                    {% endfor %}
+
+                                {% else %}
+
+                                    <p class="text-muted mb-0">
+                                        No matching skills found.
+                                    </p>
+
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Missing Skills -->
+                    <div class="col-lg-6">
+                        <div class="card app-card shadow-sm h-100">
+
+                            <div class="card-header custom-card-header">
+                                ❌ Missing Skills
+                            </div>
+
+                            <div class="card-body p-4">
+
+                                {% if results.missing_skills %}
+
+                                    {% for skill in results.missing_skills %}
+                                        <span class="badge skill-badge missing-badge">
+                                            {{ skill }}
+                                        </span>
+                                    {% endfor %}
+
+                                {% else %}
+
+                                    <p class="text-muted mb-0">
+                                        No missing skills detected.
+                                    </p>
+
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                </section>
+
+                <!-- Recommendation -->
+                <section class="card app-card recommendation-card shadow-sm mt-4">
                     <div class="card-body p-4">
 
-                        {% if results.matched_skills %}
+                        <h5 class="fw-bold mb-3">
+                            💡 Recommendation
+                        </h5>
 
-                            {% for skill in results.matched_skills %}
-                                <span class="badge skill-badge matched-badge">
-                                    {{ skill }}
-                                </span>
-                            {% endfor %}
+                        {% if score >= 80 %}
+
+                            <p class="mb-0">
+                                Strong alignment with the job requirements. Your skillset closely matches the role.
+                            </p>
+
+                        {% elif score >= 60 %}
+
+                            <p class="mb-0">
+                                Good match overall. Focus on strengthening the missing skills to improve your profile.
+                            </p>
 
                         {% else %}
 
-                            <p class="text-muted mb-0">
-                                No matching skills found.
+                            <p class="mb-0">
+                                Several skill gaps were identified. Prioritize the missing technologies before applying.
                             </p>
 
                         {% endif %}
 
                     </div>
+                </section>
 
-                </div>
-            </div>
+            {% endif %}
 
-            <!-- Missing Skills -->
-            <div class="col-lg-6">
-                <div class="card app-card shadow-sm h-100">
+        </div>
 
-                    <div class="card-header custom-card-header">
-                        ❌ Missing Skills
-                    </div>
+    </div>
 
-                    <div class="card-body p-4">
-
-                        {% if results.missing_skills %}
-
-                            {% for skill in results.missing_skills %}
-                                <span class="badge skill-badge missing-badge">
-                                    {{ skill }}
-                                </span>
-                            {% endfor %}
-
-                        {% else %}
-
-                            <p class="text-muted mb-0">
-                                No missing skills detected.
-                            </p>
-
-                        {% endif %}
-
-                    </div>
-
-                </div>
-            </div>
-
-        </section>
-
-        <!-- Recommendation -->
-        <section class="card app-card recommendation-card shadow-sm mt-4">
-            <div class="card-body p-4">
-
-                <h5 class="fw-bold mb-3">
-                    💡 Recommendation
-                </h5>
-
-                {% if score >= 80 %}
-
-                    <p class="mb-0">
-                        Strong alignment with the job requirements. Your skillset closely matches the role.
-                    </p>
-
-                {% elif score >= 60 %}
-
-                    <p class="mb-0">
-                        Good match overall. Focus on strengthening the missing skills to improve your profile.
-                    </p>
-
-                {% else %}
-
-                    <p class="mb-0">
-                        Several skill gaps were identified. Prioritize the missing technologies before applying.
-                    </p>
-
-                {% endif %}
-
-            </div>
-        </section>
-
-    {% endif %}
-
-</div>
-```
-
-</div>
-
-<script>
-    document.querySelectorAll('.progress-bar').forEach((bar) => {
-        const score = bar.dataset.score || 0;
-        bar.style.width = `${score}%`;
-    });
-</script>
+    <script>
+        document.querySelectorAll('.progress-bar').forEach((bar) => {
+            const score = bar.dataset.score || 0;
+            bar.style.width = `${score}%`;
+        });
+    </script>
 
 </body>
 </html>

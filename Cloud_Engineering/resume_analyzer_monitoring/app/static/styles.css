@@ -1,76 +1,183 @@
+/* ===== Global Styles ===== */
+
+* {
+    box-sizing: border-box;
+}
+
 body {
-    background: #f5f7fb;
+    min-height: 100vh;
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #7a9cc9;
+    color: #1f2937;
 }
 
 .app-wrapper {
     min-height: 100vh;
 }
 
+/* ===== Hero Section ===== */
+
+.hero-section {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
 .hero-badge {
     display: inline-block;
-    background: #e8f0ff;
-    color: #0d6efd;
-    padding: 0.45rem 0.9rem;
+    padding: 8px 16px;
+    margin-bottom: 16px;
     border-radius: 999px;
-    font-size: 0.85rem;
+    background: #e0ecff;
+    color: #1d4ed8;
+    font-size: 14px;
     font-weight: 600;
+}
+
+.hero-section h1 {
+    color: #111827;
+    margin-bottom: 12px;
 }
 
 .hero-subtitle {
-    max-width: 760px;
+    max-width: 720px;
+    margin: 0 auto;
+    color: #6b7280;
 }
+
+/* ===== Cards ===== */
 
 .app-card {
-    border: 0;
-    border-radius: 18px;
-}
-
-.custom-textarea {
-    border-radius: 14px;
-    resize: none;
-}
-
-.analyze-btn {
-    border-radius: 999px;
-    font-weight: 600;
-}
-
-.score-text {
-    font-size: 3rem;
-    font-weight: 700;
-}
-
-.custom-progress {
-    height: 12px;
-    border-radius: 999px;
-}
-
-.progress-bar {
-    border-radius: 999px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06);
 }
 
 .custom-card-header {
     background: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 16px 20px;
     font-weight: 700;
-    border-bottom: 1px solid #eef0f4;
-    padding: 1rem 1.25rem;
+    color: #111827;
 }
 
-.skill-badge {
-    font-size: 0.9rem;
-    padding: 0.65rem 0.85rem;
-    margin: 0.25rem;
+/* ===== Form ===== */
+
+.form-label {
+    color: #374151;
+}
+
+.custom-textarea {
+    width: 100%;
+    min-height: 300px;
+    padding: 16px;
+    border: 1px solid #d1d5db;
+    border-radius: 14px;
+    background: #ffffff;
+    color: #111827;
+    resize: vertical;
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+.custom-textarea:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+    outline: none;
+}
+
+.custom-textarea::placeholder {
+    color: #9ca3af;
+}
+
+/* ===== Button ===== */
+
+.analyze-btn {
+    background: #2563eb;
+    border: none;
+    border-radius: 999px;
+    padding: 14px 36px;
+    font-weight: 700;
+    color: #ffffff;
+    transition: all 0.2s ease;
+}
+
+.analyze-btn:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px rgba(37, 99, 235, 0.25);
+}
+
+/* ===== Score Cards ===== */
+
+.score-text {
+    font-size: 48px;
+    font-weight: 800;
+    color: #2563eb;
+}
+
+.custom-progress {
+    height: 12px;
+    background: #e5e7eb;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    background: #2563eb;
     border-radius: 999px;
 }
 
+/* ===== Skill Badges ===== */
+
+.skill-badge {
+    display: inline-block;
+    margin: 4px;
+    padding: 10px 14px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
 .matched-badge {
-    background: #198754;
+    background: #dcfce7;
+    color: #166534;
+    border: 1px solid #86efac;
 }
 
 .missing-badge {
-    background: #dc3545;
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fca5a5;
 }
 
+/* ===== Recommendation ===== */
+
 .recommendation-card {
-    border-left: 5px solid #0d6efd;
+    border-left: 6px solid #2563eb;
+}
+
+.recommendation-card h5 {
+    color: #111827;
+}
+
+/* ===== Responsive ===== */
+
+@media (max-width: 768px) {
+    .hero-section {
+        margin-bottom: 28px;
+    }
+
+    .score-text {
+        font-size: 38px;
+    }
+
+    .custom-textarea {
+        min-height: 220px;
+    }
+
+    .analyze-btn {
+        width: 100%;
+    }
 }
