@@ -16,7 +16,11 @@ services:
       - prometheus
  
   app:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: resume-analyzer-app
     ports:
       - "5000:5000"
+    volumes:
+      - ./app:/app  # Mount the app directory

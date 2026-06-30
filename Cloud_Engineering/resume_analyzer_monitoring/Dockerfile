@@ -1,13 +1,20 @@
+# Use Python 3.13 slim image
 FROM python:3.13-slim
 
+# Set working directory
 WORKDIR /app
 
-COPY app/requirements.txt .
+# Copy requirements file
+COPY requirements.txt .
 
+# Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY app/ .
+# Copy the entire application
+COPY . .
 
+# Expose the Flask port
 EXPOSE 5000
 
+# Run the Flask application
 CMD ["python", "app.py"]
