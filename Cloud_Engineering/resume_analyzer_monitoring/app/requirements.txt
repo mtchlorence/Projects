@@ -1,2 +1,5 @@
 flask
 prometheus-client
+PyPDF2
+pdfplumber
+python-dotenv

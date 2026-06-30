@@ -12,7 +12,7 @@
         rel="stylesheet"
     >
     
-    <!-- Font Awesome 6 (free icons) -->
+    <!-- Font Awesome 6 -->
     <link
         rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
@@ -30,9 +30,7 @@
     >
 
     <style>
-        /* ===== Additional Inline Styles for Target UI ===== */
-        
-        /* Typography */
+        /* ===== Base Styles ===== */
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: #f8fafc;
@@ -44,7 +42,7 @@
             padding: 2rem 0;
         }
 
-        /* Hero Section */
+        /* ===== Hero Section ===== */
         .hero-section {
             text-align: center;
             margin-bottom: 2.5rem;
@@ -82,7 +80,7 @@
             line-height: 1.6;
         }
 
-        /* Cards */
+        /* ===== Cards ===== */
         .app-card {
             background: #ffffff;
             border: 1px solid #e9edf4;
@@ -95,17 +93,126 @@
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
         }
 
-        .card-header-custom {
-            background: #ffffff;
-            border-bottom: 1px solid #f1f4f9;
-            padding: 1.25rem 1.5rem;
-            font-weight: 700;
-            font-size: 1rem;
-            color: #0f172a;
-            border-radius: 20px 20px 0 0 !important;
+        /* ===== File Upload Area ===== */
+        .upload-area {
+            border: 2px dashed #d1d5db;
+            border-radius: 14px;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            background: #fafbfc;
+            position: relative;
         }
 
-        /* Textareas */
+        .upload-area:hover {
+            border-color: #2563eb;
+            background: #f0f4ff;
+        }
+
+        .upload-area.dragover {
+            border-color: #2563eb;
+            background: #eff6ff;
+            transform: scale(1.01);
+        }
+
+        .upload-area.has-file {
+            border-color: #22c55e;
+            background: #f0fdf4;
+        }
+
+        .upload-area .upload-icon {
+            font-size: 2.5rem;
+            color: #94a3b8;
+            margin-bottom: 0.75rem;
+        }
+
+        .upload-area .upload-text {
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        .upload-area .upload-subtext {
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+
+        .upload-area .file-info {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+
+        .upload-area.has-file .file-info {
+            display: flex;
+        }
+
+        .upload-area.has-file .upload-placeholder {
+            display: none;
+        }
+
+        .upload-area .file-info i {
+            font-size: 2rem;
+            color: #22c55e;
+        }
+
+        .upload-area .file-info .file-name {
+            font-weight: 600;
+            color: #0f172a;
+            word-break: break-all;
+        }
+
+        .upload-area .file-info .file-size {
+            color: #64748b;
+            font-size: 0.8rem;
+        }
+
+        .upload-area .remove-file {
+            background: none;
+            border: none;
+            color: #ef4444;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0.25rem 0.5rem;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        .upload-area .remove-file:hover {
+            background: #fef2f2;
+        }
+
+        #resume_file_input {
+            display: none;
+        }
+
+        .toggle-input-btn {
+            background: none;
+            border: none;
+            color: #2563eb;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 0.25rem 0.75rem;
+            border-radius: 8px;
+            transition: background 0.2s;
+            font-size: 0.85rem;
+        }
+
+        .toggle-input-btn:hover {
+            background: #eff6ff;
+        }
+
+        /* ===== Textarea ===== */
+        .resume-textarea-wrapper {
+            display: none;
+            margin-top: 0.75rem;
+        }
+
+        .resume-textarea-wrapper.active {
+            display: block;
+        }
+
         .custom-textarea {
             width: 100%;
             min-height: 200px;
@@ -140,7 +247,7 @@
             font-weight: 500;
         }
 
-        /* Analyze Button */
+        /* ===== Analyze Button ===== */
         .analyze-btn {
             background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
             border: none;
@@ -159,11 +266,29 @@
             color: #ffffff;
         }
 
+        .analyze-btn:disabled {
+            opacity: 0.6;
+            transform: none;
+            cursor: not-allowed;
+        }
+
         .analyze-btn i {
             margin-right: 0.5rem;
         }
 
-        /* Score Card */
+        .btn-spinner {
+            display: none;
+        }
+
+        .analyze-btn.loading .btn-text {
+            display: none;
+        }
+
+        .analyze-btn.loading .btn-spinner {
+            display: inline-block;
+        }
+
+        /* ===== Score Card ===== */
         .score-card {
             background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
             border-radius: 18px;
@@ -186,7 +311,6 @@
             font-weight: 500;
         }
 
-        /* Stat Cards */
         .stat-card {
             background: #ffffff;
             border-radius: 16px;
@@ -227,7 +351,7 @@
             display: block;
         }
 
-        /* Skill Sections */
+        /* ===== Skill Sections ===== */
         .skill-section {
             background: #f8fafc;
             border-radius: 16px;
@@ -297,7 +421,7 @@
             margin-bottom: 0;
         }
 
-        /* Recommendation Box */
+        /* ===== Recommendation ===== */
         .recommendation-box {
             background: #eff6ff;
             border-left: 5px solid #2563eb;
@@ -316,7 +440,16 @@
             font-weight: 700;
         }
 
-        /* Footer */
+        /* ===== Error Alert ===== */
+        .alert-error {
+            background: #fef2f2;
+            border: 1px solid #fca5a5;
+            color: #991b1b;
+            border-radius: 14px;
+            padding: 1rem 1.25rem;
+        }
+
+        /* ===== Footer ===== */
         .footer {
             text-align: center;
             padding: 2rem 0 0.5rem;
@@ -359,7 +492,7 @@
             font-size: 1rem;
         }
 
-        /* Responsive */
+        /* ===== Responsive ===== */
         @media (max-width: 768px) {
             .hero-section h1 {
                 font-size: 1.8rem;
@@ -390,6 +523,10 @@
                 flex-direction: column;
                 align-items: center;
                 gap: 0.4rem;
+            }
+
+            .upload-area {
+                padding: 1.5rem 1rem;
             }
         }
 
@@ -431,8 +568,8 @@
                 </h1>
 
                 <p class="hero-subtitle">
-                    Compare your resume against a job description, identify matched skills,
-                    detect missing skills, and generate a quick fit recommendation.
+                    Upload your resume (PDF) or paste text, then compare against a job description
+                    to identify matched skills, detect gaps, and get a fit recommendation.
                 </p>
             </section>
 
@@ -440,27 +577,63 @@
             <section class="card app-card shadow-sm mb-4">
                 <div class="card-body p-4 p-lg-5">
 
-                    <form action="/analyze" method="POST" id="analyzeForm">
+                    <form action="/analyze" method="POST" id="analyzeForm" enctype="multipart/form-data">
 
                         <div class="row g-4">
 
-                            <!-- Resume -->
+                            <!-- Resume Input -->
                             <div class="col-lg-6">
-                                <label for="resume" class="form-label fw-semibold">
+                                <label class="form-label fw-semibold">
                                     <i class="fas fa-user me-1"></i> Resume
                                 </label>
 
-                                <textarea
-                                    class="form-control custom-textarea"
-                                    id="resume"
-                                    name="resume"
-                                    rows="10"
-                                    placeholder="Paste your resume here..."
-                                    maxlength="5000"
-                                >{{ resume if resume else '' }}</textarea>
+                                <!-- File Upload Area -->
+                                <div class="upload-area" id="uploadArea">
+                                    <input type="file" id="resume_file_input" name="resume_file" accept=".pdf">
 
-                                <div class="char-counter" id="resumeCount">
-                                    0 / 5000
+                                    <div class="upload-placeholder">
+                                        <div class="upload-icon">
+                                            <i class="fas fa-cloud-upload-alt"></i>
+                                        </div>
+                                        <div class="upload-text">Drop your PDF here</div>
+                                        <div class="upload-subtext">or click to browse</div>
+                                        <div class="upload-subtext" style="margin-top: 0.5rem; font-size: 0.75rem; color: #94a3b8;">
+                                            <i class="fas fa-file-pdf"></i> PDF files only · Max 16MB
+                                        </div>
+                                    </div>
+
+                                    <div class="file-info">
+                                        <i class="fas fa-file-pdf"></i>
+                                        <div>
+                                            <div class="file-name" id="fileName">resume.pdf</div>
+                                            <div class="file-size" id="fileSize">0 KB</div>
+                                        </div>
+                                        <button type="button" class="remove-file" id="removeFile" title="Remove file">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Toggle to text input -->
+                                <div class="mt-2 text-end">
+                                    <button type="button" class="toggle-input-btn" id="toggleResumeInput">
+                                        <i class="fas fa-edit"></i> Or paste text instead
+                                    </button>
+                                </div>
+
+                                <!-- Textarea (hidden by default) -->
+                                <div class="resume-textarea-wrapper" id="resumeTextareaWrapper">
+                                    <textarea
+                                        class="form-control custom-textarea"
+                                        id="resume"
+                                        name="resume"
+                                        rows="8"
+                                        placeholder="Paste your resume text here..."
+                                        maxlength="5000"
+                                    >{{ resume if resume else '' }}</textarea>
+                                    <div class="char-counter" id="resumeCount">
+                                        {{ resume|length if resume else 0 }} / 5000
+                                    </div>
                                 </div>
                             </div>
 
@@ -480,7 +653,7 @@
                                 >{{ job_description if job_description else '' }}</textarea>
 
                                 <div class="char-counter" id="jobCount">
-                                    0 / 5000
+                                    {{ job_description|length if job_description else 0 }} / 5000
                                 </div>
                             </div>
 
@@ -488,8 +661,13 @@
 
                         <!-- Submit Button -->
                         <div class="text-center mt-4">
-                            <button type="submit" class="btn analyze-btn">
-                                <i class="fas fa-chart-line"></i> Analyze Resume
+                            <button type="submit" class="btn analyze-btn" id="analyzeBtn">
+                                <span class="btn-text">
+                                    <i class="fas fa-chart-line"></i> Analyze Resume
+                                </span>
+                                <span class="btn-spinner">
+                                    <i class="fas fa-spinner fa-spin"></i> Analyzing...
+                                </span>
                             </button>
                         </div>
 
@@ -497,6 +675,14 @@
 
                 </div>
             </section>
+
+            <!-- ===== ERROR MESSAGE ===== -->
+            {% if error %}
+                <div class="alert-error mb-4">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    {{ error }}
+                </div>
+            {% endif %}
 
             <!-- ===== RESULTS SECTION ===== -->
             {% if results %}
@@ -508,7 +694,6 @@
                 <!-- Metrics Row -->
                 <section class="row g-4 mb-4">
 
-                    <!-- Score Card -->
                     <div class="col-md-4">
                         <div class="score-card">
                             <div class="score-number">{{ score }}%</div>
@@ -516,7 +701,6 @@
                         </div>
                     </div>
 
-                    <!-- Matched Skills -->
                     <div class="col-md-4">
                         <div class="stat-card">
                             <span class="stat-icon text-success">
@@ -527,7 +711,6 @@
                         </div>
                     </div>
 
-                    <!-- Missing Skills -->
                     <div class="col-md-4">
                         <div class="stat-card">
                             <span class="stat-icon text-danger">
@@ -540,10 +723,9 @@
 
                 </section>
 
-                <!-- Skills Detail Row -->
+                <!-- Skills Detail -->
                 <section class="row g-4">
 
-                    <!-- Matched Skills List -->
                     <div class="col-md-6">
                         <div class="skill-section">
                             <h6 class="text-success">
@@ -564,7 +746,6 @@
                         </div>
                     </div>
 
-                    <!-- Missing Skills List -->
                     <div class="col-md-6">
                         <div class="skill-section">
                             <h6 class="text-danger">
@@ -637,33 +818,135 @@
 
     <!-- ===== JAVASCRIPT ===== -->
     <script>
-        // ----- Character Counters -----
         document.addEventListener('DOMContentLoaded', function() {
-            const textareas = document.querySelectorAll('textarea[maxlength]');
 
+            // ----- File Upload Logic -----
+            const uploadArea = document.getElementById('uploadArea');
+            const fileInput = document.getElementById('resume_file_input');
+            const fileName = document.getElementById('fileName');
+            const fileSize = document.getElementById('fileSize');
+            const removeFileBtn = document.getElementById('removeFile');
+            const toggleBtn = document.getElementById('toggleResumeInput');
+            const textareaWrapper = document.getElementById('resumeTextareaWrapper');
+            const analyzeBtn = document.getElementById('analyzeBtn');
+            const analyzeForm = document.getElementById('analyzeForm');
+
+            // Click to browse
+            uploadArea.addEventListener('click', function(e) {
+                if (!e.target.closest('.remove-file')) {
+                    fileInput.click();
+                }
+            });
+
+            // Drag and drop
+            uploadArea.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.classList.add('dragover');
+            });
+
+            uploadArea.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                this.classList.remove('dragover');
+            });
+
+            uploadArea.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    handleFile(files[0]);
+                }
+            });
+
+            // File input change
+            fileInput.addEventListener('change', function() {
+                if (this.files.length > 0) {
+                    handleFile(this.files[0]);
+                }
+            });
+
+            // Handle file selection
+            function handleFile(file) {
+                // Validate file type
+                if (file.type !== 'application/pdf') {
+                    alert('Please upload a PDF file.');
+                    fileInput.value = '';
+                    return;
+                }
+
+                // Validate file size (16MB)
+                if (file.size > 16 * 1024 * 1024) {
+                    alert('File is too large. Maximum size is 16MB.');
+                    fileInput.value = '';
+                    return;
+                }
+
+                // Update UI
+                uploadArea.classList.add('has-file');
+                fileName.textContent = file.name;
+                fileSize.textContent = (file.size / 1024).toFixed(1) + ' KB';
+
+                // Hide textarea if visible
+                textareaWrapper.classList.remove('active');
+                toggleBtn.innerHTML = '<i class="fas fa-edit"></i> Or paste text instead';
+            }
+
+            // Remove file
+            removeFileBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                fileInput.value = '';
+                uploadArea.classList.remove('has-file');
+                // Show textarea if it was active
+                if (textareaWrapper.classList.contains('active')) {
+                    // Keep it active
+                } else {
+                    toggleBtn.click();
+                }
+            });
+
+            // Toggle between file upload and text input
+            toggleBtn.addEventListener('click', function() {
+                textareaWrapper.classList.toggle('active');
+                if (textareaWrapper.classList.contains('active')) {
+                    this.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Upload PDF instead';
+                    // Clear file if present
+                    if (uploadArea.classList.contains('has-file')) {
+                        fileInput.value = '';
+                        uploadArea.classList.remove('has-file');
+                    }
+                } else {
+                    this.innerHTML = '<i class="fas fa-edit"></i> Or paste text instead';
+                }
+            });
+
+            // ----- Character Counters -----
+            const textareas = document.querySelectorAll('textarea[maxlength]');
             textareas.forEach(textarea => {
                 const counterId = textarea.id + 'Count';
                 const counter = document.getElementById(counterId);
 
                 if (counter) {
-                    // Set initial count
-                    counter.textContent = textarea.value.length + ' / ' + textarea.maxLength;
-
-                    // Update on input
                     textarea.addEventListener('input', function() {
                         const count = this.value.length;
                         counter.textContent = count + ' / ' + this.maxLength;
                     });
                 }
             });
-        });
 
-        // ----- Auto-resize textareas (optional enhancement) -----
-        document.querySelectorAll('.custom-textarea').forEach(textarea => {
-            textarea.addEventListener('input', function() {
-                this.style.height = 'auto';
-                this.style.height = Math.min(this.scrollHeight, 400) + 'px';
+            // ----- Form Submit Loading State -----
+            analyzeForm.addEventListener('submit', function() {
+                analyzeBtn.classList.add('loading');
+                analyzeBtn.disabled = true;
             });
+
+            // ----- Auto-resize textareas -----
+            document.querySelectorAll('.custom-textarea').forEach(textarea => {
+                textarea.addEventListener('input', function() {
+                    this.style.height = 'auto';
+                    this.style.height = Math.min(this.scrollHeight, 400) + 'px';
+                });
+            });
+
         });
     </script>
 
