@@ -3,6 +3,10 @@ from analyzer import analyze_resume
 from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST
 import time
 
+import logging
+from logging.handlers import RotatingFileHandler
+
+    
 app = Flask(__name__)
 ANALYSIS_TOTAL = Counter(
     "resume_analysis_total",
@@ -23,6 +27,18 @@ ANALYSIS_DURATION = Histogram(
     "resume_analysis_duration_seconds",
     "Time spent processing resume analysis"
 )
+
+
+if not app.debug:
+    handler = RotatingFileHandler('app.log', maxBytes=10000, backupCount=3)
+    handler.setLevel(logging.INFO)
+    app.logger.addHandler(handler)
+    app.logger.setLevel(logging.INFO)
+
+@app.before_request
+def log_request():
+    app.logger.info(f"Request: {request.method} {request.path}")
+
 
 @app.route("/")
 def home():
@@ -64,3 +80,4 @@ def metrics():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
+

@@ -5,8 +5,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Resume Skill Analyzer</title>
+    
+    <!-- Bootstrap 5 CSS -->
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+    
+    <!-- Font Awesome 6 (free icons) -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    >
+    
+    <!-- Google Fonts (Inter) -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap"
         rel="stylesheet"
     >
 
@@ -15,72 +29,467 @@
         href="{{ url_for('static', filename='css/styles.css') }}"
     >
 
+    <style>
+        /* ===== Additional Inline Styles for Target UI ===== */
+        
+        /* Typography */
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f8fafc;
+            color: #0f172a;
+        }
+
+        .app-wrapper {
+            min-height: 100vh;
+            padding: 2rem 0;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            padding: 6px 18px;
+            border-radius: 999px;
+            background: #dbeafe;
+            color: #1d4ed8;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+        }
+
+        .hero-section h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #0f172a;
+            margin-top: 1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .hero-section h1 i {
+            color: #2563eb;
+        }
+
+        .hero-subtitle {
+            max-width: 640px;
+            margin: 0 auto;
+            color: #64748b;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        /* Cards */
+        .app-card {
+            background: #ffffff;
+            border: 1px solid #e9edf4;
+            border-radius: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+            transition: box-shadow 0.2s ease;
+        }
+
+        .app-card:hover {
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+        }
+
+        .card-header-custom {
+            background: #ffffff;
+            border-bottom: 1px solid #f1f4f9;
+            padding: 1.25rem 1.5rem;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #0f172a;
+            border-radius: 20px 20px 0 0 !important;
+        }
+
+        /* Textareas */
+        .custom-textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 1rem 1.25rem;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 14px;
+            background: #fafbfc;
+            color: #0f172a;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            resize: vertical;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .custom-textarea:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.10);
+            background: #ffffff;
+            outline: none;
+        }
+
+        .custom-textarea::placeholder {
+            color: #94a3b8;
+        }
+
+        .char-counter {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            text-align: right;
+            margin-top: 0.4rem;
+            font-weight: 500;
+        }
+
+        /* Analyze Button */
+        .analyze-btn {
+            background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+            border: none;
+            border-radius: 999px;
+            padding: 0.9rem 3rem;
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: #ffffff;
+            transition: transform 0.2s, box-shadow 0.3s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .analyze-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(37, 99, 235, 0.30);
+            color: #ffffff;
+        }
+
+        .analyze-btn i {
+            margin-right: 0.5rem;
+        }
+
+        /* Score Card */
+        .score-card {
+            background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+            border-radius: 18px;
+            padding: 1.75rem 1.5rem;
+            text-align: center;
+            color: #ffffff;
+            height: 100%;
+            box-shadow: 0 4px 20px rgba(37, 99, 235, 0.25);
+        }
+
+        .score-number {
+            font-size: 3.2rem;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+
+        .score-label {
+            font-size: 0.9rem;
+            opacity: 0.85;
+            font-weight: 500;
+        }
+
+        /* Stat Cards */
+        .stat-card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 1.5rem 1.25rem;
+            text-align: center;
+            height: 100%;
+            border: 1px solid #e9edf4;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+        }
+
+        .stat-number {
+            font-size: 2.4rem;
+            font-weight: 800;
+            color: #0f172a;
+            line-height: 1.2;
+        }
+
+        .stat-number.text-success {
+            color: #16a34a;
+        }
+
+        .stat-number.text-danger {
+            color: #dc2626;
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-top: 0.25rem;
+        }
+
+        .stat-card .stat-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.25rem;
+            display: block;
+        }
+
+        /* Skill Sections */
+        .skill-section {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 1.25rem 1.5rem;
+            height: 100%;
+            border: 1px solid #f1f4f9;
+        }
+
+        .skill-section h6 {
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+        }
+
+        .skill-section h6 i {
+            margin-right: 0.5rem;
+        }
+
+        .skill-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .skill-list li {
+            display: inline-block;
+            padding: 0.4rem 1.1rem;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: 1px solid transparent;
+            transition: transform 0.15s;
+        }
+
+        .skill-list li:hover {
+            transform: scale(1.04);
+        }
+
+        .skill-list li.matched {
+            background: #dcfce7;
+            border-color: #86efac;
+            color: #166534;
+        }
+
+        .skill-list li.matched::before {
+            content: "✓ ";
+            font-weight: 700;
+        }
+
+        .skill-list li.missing {
+            background: #fee2e2;
+            border-color: #fca5a5;
+            color: #991b1b;
+        }
+
+        .skill-list li.missing::before {
+            content: "✗ ";
+            font-weight: 700;
+        }
+
+        .empty-skills-message {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            margin-bottom: 0;
+        }
+
+        /* Recommendation Box */
+        .recommendation-box {
+            background: #eff6ff;
+            border-left: 5px solid #2563eb;
+            border-radius: 14px;
+            padding: 1.25rem 1.5rem;
+            color: #1e3a8a;
+        }
+
+        .recommendation-box i {
+            color: #2563eb;
+            margin-right: 0.6rem;
+            font-size: 1.1rem;
+        }
+
+        .recommendation-box strong {
+            font-weight: 700;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2rem 0 0.5rem;
+            margin-top: 2.5rem;
+            border-top: 1px solid #e9edf4;
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+
+        .footer a {
+            color: #475569;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        .footer a:hover {
+            color: #2563eb;
+        }
+
+        .footer i {
+            margin: 0 0.2rem;
+        }
+
+        .footer .tech-stack {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0.75rem 1.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .footer .tech-stack span {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .footer .tech-stack i {
+            font-size: 1rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-section h1 {
+                font-size: 1.8rem;
+            }
+
+            .hero-subtitle {
+                font-size: 0.95rem;
+            }
+
+            .score-number {
+                font-size: 2.4rem;
+            }
+
+            .stat-number {
+                font-size: 1.8rem;
+            }
+
+            .custom-textarea {
+                min-height: 150px;
+            }
+
+            .analyze-btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .footer .tech-stack {
+                flex-direction: column;
+                align-items: center;
+                gap: 0.4rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .app-wrapper {
+                padding: 1rem 0;
+            }
+
+            .hero-section h1 {
+                font-size: 1.5rem;
+            }
+
+            .score-card {
+                padding: 1.25rem;
+            }
+
+            .score-number {
+                font-size: 2rem;
+            }
+        }
+    </style>
+
 </head>
 
 <body>
 
     <div class="app-wrapper">
 
-        <div class="container py-5">
+        <div class="container">
 
-            <!-- Header -->
-            <section class="hero-section text-center mb-5">
+            <!-- ===== HERO SECTION ===== -->
+            <section class="hero-section">
                 <span class="hero-badge">
-                    DevOps + AI Portfolio Project
+                    <i class="fas fa-rocket me-1"></i> DevOps + AI Portfolio Project
                 </span>
 
-                <h1 class="display-5 fw-bold mt-3">
-                    🧠 Resume Skill Analyzer
+                <h1>
+                    <i class="fas fa-file-alt"></i> Resume Skill Analyzer
                 </h1>
 
-                <p class="lead text-muted mx-auto hero-subtitle">
+                <p class="hero-subtitle">
                     Compare your resume against a job description, identify matched skills,
                     detect missing skills, and generate a quick fit recommendation.
                 </p>
             </section>
 
-            <!-- Form -->
+            <!-- ===== INPUT FORM ===== -->
             <section class="card app-card shadow-sm mb-4">
-                <div class="card-body p-4">
+                <div class="card-body p-4 p-lg-5">
 
-                    <form action="/analyze" method="POST">
+                    <form action="/analyze" method="POST" id="analyzeForm">
 
                         <div class="row g-4">
 
+                            <!-- Resume -->
                             <div class="col-lg-6">
-                                <label class="form-label fw-semibold">
-                                    Resume
+                                <label for="resume" class="form-label fw-semibold">
+                                    <i class="fas fa-user me-1"></i> Resume
                                 </label>
 
                                 <textarea
                                     class="form-control custom-textarea"
+                                    id="resume"
                                     name="resume"
-                                    rows="12"
-                                    placeholder="Paste resume content here..."
+                                    rows="10"
+                                    placeholder="Paste your resume here..."
+                                    maxlength="5000"
                                 >{{ resume if resume else '' }}</textarea>
+
+                                <div class="char-counter" id="resumeCount">
+                                    0 / 5000
+                                </div>
                             </div>
 
+                            <!-- Job Description -->
                             <div class="col-lg-6">
-                                <label class="form-label fw-semibold">
-                                    Job Description
+                                <label for="job_description" class="form-label fw-semibold">
+                                    <i class="fas fa-briefcase me-1"></i> Job Description
                                 </label>
 
                                 <textarea
                                     class="form-control custom-textarea"
+                                    id="job_description"
                                     name="job_description"
-                                    rows="12"
-                                    placeholder="Paste job description here..."
+                                    rows="10"
+                                    placeholder="Paste the job description here..."
+                                    maxlength="5000"
                                 >{{ job_description if job_description else '' }}</textarea>
+
+                                <div class="char-counter" id="jobCount">
+                                    0 / 5000
+                                </div>
                             </div>
 
                         </div>
 
+                        <!-- Submit Button -->
                         <div class="text-center mt-4">
-                            <button
-                                type="submit"
-                                class="btn btn-primary btn-lg px-5 analyze-btn"
-                            >
-                                Analyze Resume
+                            <button type="submit" class="btn analyze-btn">
+                                <i class="fas fa-chart-line"></i> Analyze Resume
                             </button>
                         </div>
 
@@ -89,182 +498,172 @@
                 </div>
             </section>
 
-            <!-- Results -->
+            <!-- ===== RESULTS SECTION ===== -->
             {% if results %}
 
                 {% set score = results.score | default(0) %}
+                {% set matched = results.matched_skills | default([]) %}
+                {% set missing = results.missing_skills | default([]) %}
 
+                <!-- Metrics Row -->
                 <section class="row g-4 mb-4">
 
-                    <div class="col-lg-4">
-                        <div class="card app-card shadow-sm h-100">
-                            <div class="card-body text-center p-4">
-
-                                <p class="text-muted mb-1">
-                                    Match Score
-                                </p>
-
-                                <h2 class="score-text mb-3">
-                                    {{ score }}%
-                                </h2>
-
-                                <div class="progress custom-progress">
-                                    <div
-                                        class="progress-bar"
-                                        role="progressbar"
-                                        data-score="{{ score }}"
-                                        aria-valuenow="{{ score }}"
-                                        aria-valuemin="0"
-                                        aria-valuemax="100"
-                                    >
-                                    </div>
-                                </div>
-
-                            </div>
+                    <!-- Score Card -->
+                    <div class="col-md-4">
+                        <div class="score-card">
+                            <div class="score-number">{{ score }}%</div>
+                            <div class="score-label">Match Score</div>
                         </div>
                     </div>
 
-                    <div class="col-lg-4">
-                        <div class="card app-card shadow-sm h-100">
-                            <div class="card-body text-center p-4">
-
-                                <p class="text-muted mb-1">
-                                    Matched Skills
-                                </p>
-
-                                <h2 class="text-success mb-0">
-                                    {{ results.matched_skills | length }}
-                                </h2>
-
-                            </div>
+                    <!-- Matched Skills -->
+                    <div class="col-md-4">
+                        <div class="stat-card">
+                            <span class="stat-icon text-success">
+                                <i class="fas fa-check-circle"></i>
+                            </span>
+                            <div class="stat-number text-success">{{ matched | length }}</div>
+                            <div class="stat-label">Matched Skills</div>
                         </div>
                     </div>
 
-                    <div class="col-lg-4">
-                        <div class="card app-card shadow-sm h-100">
-                            <div class="card-body text-center p-4">
-
-                                <p class="text-muted mb-1">
-                                    Missing Skills
-                                </p>
-
-                                <h2 class="text-danger mb-0">
-                                    {{ results.missing_skills | length }}
-                                </h2>
-
-                            </div>
+                    <!-- Missing Skills -->
+                    <div class="col-md-4">
+                        <div class="stat-card">
+                            <span class="stat-icon text-danger">
+                                <i class="fas fa-exclamation-circle"></i>
+                            </span>
+                            <div class="stat-number text-danger">{{ missing | length }}</div>
+                            <div class="stat-label">Missing Skills</div>
                         </div>
                     </div>
 
                 </section>
 
+                <!-- Skills Detail Row -->
                 <section class="row g-4">
 
-                    <!-- Matched Skills -->
-                    <div class="col-lg-6">
-                        <div class="card app-card shadow-sm h-100">
+                    <!-- Matched Skills List -->
+                    <div class="col-md-6">
+                        <div class="skill-section">
+                            <h6 class="text-success">
+                                <i class="fas fa-check-circle"></i> Matched Skills
+                            </h6>
 
-                            <div class="card-header custom-card-header">
-                                ✅ Matched Skills
-                            </div>
-
-                            <div class="card-body p-4">
-
-                                {% if results.matched_skills %}
-
-                                    {% for skill in results.matched_skills %}
-                                        <span class="badge skill-badge matched-badge">
-                                            {{ skill }}
-                                        </span>
+                            {% if matched %}
+                                <ul class="skill-list">
+                                    {% for skill in matched %}
+                                        <li class="matched">{{ skill }}</li>
                                     {% endfor %}
-
-                                {% else %}
-
-                                    <p class="text-muted mb-0">
-                                        No matching skills found.
-                                    </p>
-
-                                {% endif %}
-
-                            </div>
-
+                                </ul>
+                            {% else %}
+                                <p class="empty-skills-message">
+                                    <i class="fas fa-info-circle"></i> No matching skills found.
+                                </p>
+                            {% endif %}
                         </div>
                     </div>
 
-                    <!-- Missing Skills -->
-                    <div class="col-lg-6">
-                        <div class="card app-card shadow-sm h-100">
+                    <!-- Missing Skills List -->
+                    <div class="col-md-6">
+                        <div class="skill-section">
+                            <h6 class="text-danger">
+                                <i class="fas fa-exclamation-circle"></i> Missing Skills
+                            </h6>
 
-                            <div class="card-header custom-card-header">
-                                ❌ Missing Skills
-                            </div>
-
-                            <div class="card-body p-4">
-
-                                {% if results.missing_skills %}
-
-                                    {% for skill in results.missing_skills %}
-                                        <span class="badge skill-badge missing-badge">
-                                            {{ skill }}
-                                        </span>
+                            {% if missing %}
+                                <ul class="skill-list">
+                                    {% for skill in missing %}
+                                        <li class="missing">{{ skill }}</li>
                                     {% endfor %}
-
-                                {% else %}
-
-                                    <p class="text-muted mb-0">
-                                        No missing skills detected.
-                                    </p>
-
-                                {% endif %}
-
-                            </div>
-
+                                </ul>
+                            {% else %}
+                                <p class="empty-skills-message">
+                                    <i class="fas fa-check-circle"></i> No missing skills detected.
+                                </p>
+                            {% endif %}
                         </div>
                     </div>
 
                 </section>
 
                 <!-- Recommendation -->
-                <section class="card app-card recommendation-card shadow-sm mt-4">
-                    <div class="card-body p-4">
+                <section class="recommendation-box mt-4">
+                    <i class="fas fa-lightbulb"></i>
+                    <strong>Recommendation:</strong>
 
-                        <h5 class="fw-bold mb-3">
-                            💡 Recommendation
-                        </h5>
-
-                        {% if score >= 80 %}
-
-                            <p class="mb-0">
-                                Strong alignment with the job requirements. Your skillset closely matches the role.
-                            </p>
-
-                        {% elif score >= 60 %}
-
-                            <p class="mb-0">
-                                Good match overall. Focus on strengthening the missing skills to improve your profile.
-                            </p>
-
-                        {% else %}
-
-                            <p class="mb-0">
-                                Several skill gaps were identified. Prioritize the missing technologies before applying.
-                            </p>
-
-                        {% endif %}
-
-                    </div>
+                    {% if score >= 80 %}
+                        Your skills align very well with this role. You're a strong candidate — proceed with confidence!
+                    {% elif score >= 60 %}
+                        You have a solid foundation. Focus on the missing skills above to strengthen your profile before applying.
+                    {% else %}
+                        Several skill gaps were identified. Prioritize the missing technologies before applying.
+                    {% endif %}
                 </section>
 
             {% endif %}
+
+            <!-- ===== FOOTER ===== -->
+            <footer class="footer">
+                <div class="tech-stack">
+                    <span>
+                        Built with <i class="fas fa-heart" style="color: #ef4444;"></i>
+                    </span>
+                    <span>
+                        <i class="fab fa-python" style="color: #3776AB;"></i>
+                        <a href="#">Flask</a>
+                    </span>
+                    <span>
+                        <i class="fab fa-docker" style="color: #2496ED;"></i>
+                        Docker
+                    </span>
+                    <span>
+                        <i class="fas fa-chart-line" style="color: #e6522c;"></i>
+                        Prometheus
+                    </span>
+                    <span>
+                        <i class="fas fa-chart-pie" style="color: #F46825;"></i>
+                        Grafana
+                    </span>
+                </div>
+                <div style="margin-top: 0.75rem; font-size: 0.8rem;">
+                    <i class="fas fa-code"></i> DevOps · Cloud · AI Portfolio Project
+                </div>
+            </footer>
 
         </div>
 
     </div>
 
+    <!-- ===== JAVASCRIPT ===== -->
     <script>
-        document.querySelectorAll('.progress-bar').forEach((bar) => {
-            const score = bar.dataset.score || 0;
-            bar.style.width = `${score}%`;
+        // ----- Character Counters -----
+        document.addEventListener('DOMContentLoaded', function() {
+            const textareas = document.querySelectorAll('textarea[maxlength]');
+
+            textareas.forEach(textarea => {
+                const counterId = textarea.id + 'Count';
+                const counter = document.getElementById(counterId);
+
+                if (counter) {
+                    // Set initial count
+                    counter.textContent = textarea.value.length + ' / ' + textarea.maxLength;
+
+                    // Update on input
+                    textarea.addEventListener('input', function() {
+                        const count = this.value.length;
+                        counter.textContent = count + ' / ' + this.maxLength;
+                    });
+                }
+            });
+        });
+
+        // ----- Auto-resize textareas (optional enhancement) -----
+        document.querySelectorAll('.custom-textarea').forEach(textarea => {
+            textarea.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = Math.min(this.scrollHeight, 400) + 'px';
+            });
         });
     </script>
 
