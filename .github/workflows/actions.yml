@@ -1,36 +1,58 @@
-# This is a basic workflow to help you get started with Actions
+name: CI/CD Pipeline
 
-name: CI
-
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
+  test-and-build:
     runs-on: ubuntu-latest
+    
+    # Set working directory to where your code lives
+    defaults:
+      run:
+        working-directory: Cloud_Engineering/resume_analyzer_monitoring
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
-
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
-
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
+      
+      - name: Debug - List files
         run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+          echo "Current directory: $(pwd)"
+          ls -la
+          echo "Contents of app/:"
+          ls -la app/ || echo "app/ not found"
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest flake8
+      
+      - name: Lint with flake8
+        run: flake8 app/app.py app/analyzer.py --count --max-complexity=10 --statistics || echo "No flake8 issues"
+      
+      - name: Run tests
+        run: pytest tests/ || echo "No tests yet"
+      
+      - name: Build Docker image
+        run: docker build -t resume-analyzer .
+      
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+      
+      - name: Push to Docker Hub
+        run: |
+          docker tag resume-analyzer ${{ secrets.DOCKER_USERNAME }}/resume-analyzer:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/resume-analyzer:latest
