@@ -588,7 +588,7 @@
                                 </label>
 
                                 <!-- File Upload Area -->
-                                <div class="upload-area" id="uploadArea">
+                                <div class="upload-area {% if resume_filename %}has-file{% endif %}" id="uploadArea">
                                     <input type="file" id="resume_file_input" name="resume_file" accept=".pdf">
 
                                     <div class="upload-placeholder">
@@ -605,7 +605,13 @@
                                     <div class="file-info">
                                         <i class="fas fa-file-pdf"></i>
                                         <div>
-                                            <div class="file-name" id="fileName">resume.pdf</div>
+                                            <div class="file-name" id="fileName">
+                                                {% if resume_filename %}
+                                                    {{ resume_filename }}
+                                                {% else %}
+                                                    resume.pdf
+                                                {% endif %}
+                                            </div>
                                             <div class="file-size" id="fileSize">0 KB</div>
                                         </div>
                                         <button type="button" class="remove-file" id="removeFile" title="Remove file">
@@ -831,6 +837,14 @@
             const analyzeBtn = document.getElementById('analyzeBtn');
             const analyzeForm = document.getElementById('analyzeForm');
 
+            // Check if file already exists from session (after analysis)
+            if (fileName && fileName.textContent !== 'resume.pdf' && uploadArea) {
+                uploadArea.classList.add('has-file');
+                if (fileSize) {
+                    fileSize.textContent = 'Uploaded';
+                }
+            }
+
             // Click to browse
             uploadArea.addEventListener('click', function(e) {
                 if (!e.target.closest('.remove-file')) {
@@ -896,6 +910,22 @@
                 e.stopPropagation();
                 fileInput.value = '';
                 uploadArea.classList.remove('has-file');
+                fileName.textContent = 'resume.pdf';
+                fileSize.textContent = '0 KB';
+
+                // Add hidden input to tell backend to clear session
+                let clearInput = document.getElementById('clearFile');
+                if (!clearInput) {
+                    clearInput = document.createElement('input');
+                    clearInput.type = 'hidden';
+                    clearInput.name = 'clear_file';
+                    clearInput.id = 'clearFile';
+                    clearInput.value = 'true';
+                    analyzeForm.appendChild(clearInput);
+                } else {
+                    clearInput.value = 'true';
+                }
+
                 // Show textarea if it was active
                 if (textareaWrapper.classList.contains('active')) {
                     // Keep it active
@@ -913,6 +943,8 @@
                     if (uploadArea.classList.contains('has-file')) {
                         fileInput.value = '';
                         uploadArea.classList.remove('has-file');
+                        fileName.textContent = 'resume.pdf';
+                        fileSize.textContent = '0 KB';
                     }
                 } else {
                     this.innerHTML = '<i class="fas fa-edit"></i> Or paste text instead';
