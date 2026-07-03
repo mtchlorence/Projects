@@ -1,0 +1,22 @@
+{
+  "name": "data-drift-etl-aws",
+  "version": "1.0.0",
+  "description": "Serverless ETL pipeline with S3, Glue, and Athena",
+  "main": "index.js",
+  "scripts": {
+    "deploy": "npx serverless deploy",
+    "deploy:prod": "npx serverless deploy --stage prod",
+    "remove": "npx serverless remove",
+    "invoke:extract": "npx serverless invoke --function extract",
+    "invoke:transform": "npx serverless invoke --function transform",
+    "logs:extract": "npx serverless logs --function extract --tail",
+    "logs:transform": "npx serverless logs --function transform --tail",
+    "info": "npx serverless info"
+  },
+  "devDependencies": {
+    "serverless": "^3.38.0",
+    "serverless-python-requirements": "^6.0.1"
+  },
+  "author": "",
+  "license": "MIT"
+}

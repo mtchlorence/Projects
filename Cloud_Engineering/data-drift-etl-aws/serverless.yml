@@ -1,0 +1,157 @@
+service: data-drift-etl-aws
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: python3.11
+  region: us-east-1
+  stage: ${opt:stage, 'dev'}
+  timeout: 30
+  memorySize: 256
+  environment:
+    BUCKET_NAME: ${self:custom.bucket_name}
+    API_URL: https://dummyjson.com/products
+
+  iam:
+    role:
+      statements:
+        # S3 permissions
+        - Effect: Allow
+          Action:
+            - s3:PutObject
+            - s3:GetObject
+            - s3:ListBucket
+            - s3:DeleteObject
+          Resource:
+            - arn:aws:s3:::${self:custom.bucket_name}
+            - arn:aws:s3:::${self:custom.bucket_name}/*
+
+        # Glue permissions
+        - Effect: Allow
+          Action:
+            - glue:CreateDatabase
+            - glue:CreateCrawler
+            - glue:StartCrawler
+            - glue:GetCrawler
+            - glue:GetDatabase
+            - glue:GetDatabases
+          Resource: "*"
+
+        # Athena permissions
+        - Effect: Allow
+          Action:
+            - athena:StartQueryExecution
+            - athena:GetQueryResults
+            - athena:GetQueryExecution
+            - athena:ListQueryExecutions
+          Resource: "*"
+
+        # CloudWatch Logs
+        - Effect: Allow
+          Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+          Resource: "*"
+
+custom:
+  bucket_name: data-drift-${self:provider.stage}-${aws:accountId}
+  pythonRequirements:
+    dockerizePip: false  # ← DISABLED DOCKER
+    useDownloadCache: true
+    useStaticCache: true
+
+functions:
+  extract:
+    handler: lambdas/extract/handler.main
+    name: data-drift-extract-${self:provider.stage}
+    description: Extracts product data from DummyJSON API and stores raw JSON in S3
+    events:
+      - schedule:
+          name: data-drift-daily-extract-${self:provider.stage}
+          description: Runs daily at 9 PM
+          rate: cron(0 21 * * ? *)
+
+  transform:
+    handler: lambdas/transform/handler.main
+    name: data-drift-transform-${self:provider.stage}
+    description: Transforms raw JSON to CSV and stores in processed folder
+    events:
+      - s3:
+          bucket: ${self:custom.bucket_name}
+          event: s3:ObjectCreated:*
+          rules:
+            - prefix: raw/
+          existing: true
+
+resources:
+  Resources:
+    # S3 Bucket
+    DataDriftBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.bucket_name}
+        VersioningConfiguration:
+          Status: Enabled
+        LifecycleConfiguration:
+          Rules:
+            - Id: ExpireOldRawFiles
+              Status: Enabled
+              Prefix: raw/
+              ExpirationInDays: 30
+
+    # Glue Database
+    DataDriftGlueDatabase:
+      Type: AWS::Glue::Database
+      Properties:
+        CatalogId: !Ref AWS::AccountId
+        DatabaseInput:
+          Name: data_drift_db
+          Description: Database for DataDrift ETL pipeline
+
+    # Glue Crawler
+    DataDriftGlueCrawler:
+      Type: AWS::Glue::Crawler
+      Properties:
+        Name: data-drift-crawler-${self:provider.stage}
+        Role: !GetAtt GlueCrawlerRole.Arn
+        DatabaseName: data_drift_db
+        Description: Crawls processed CSV data for Athena queries
+        Targets:
+          S3Targets:
+            - Path: !Sub "s3://${self:custom.bucket_name}/processed/"
+        Schedule:
+          ScheduleExpression: cron(0 22 * * ? *)
+        SchemaChangePolicy:
+          UpdateBehavior: UPDATE_IN_DATABASE
+          DeleteBehavior: LOG
+
+    # Glue Crawler IAM Role
+    GlueCrawlerRole:
+      Type: AWS::IAM::Role
+      Properties:
+        AssumeRolePolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service: glue.amazonaws.com
+              Action: sts:AssumeRole
+        ManagedPolicyArns:
+          - arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole
+        Policies:
+          - PolicyName: GlueCrawlerS3Access
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - s3:GetObject
+                    - s3:ListBucket
+                  Resource:
+                    - !Sub "arn:aws:s3:::${self:custom.bucket_name}"
+                    - !Sub "arn:aws:s3:::${self:custom.bucket_name}/processed/*"
+
+plugins:
+  - serverless-python-requirements
