@@ -4,12 +4,14 @@
   "description": "Serverless ETL pipeline with S3, Glue, and Athena",
   "main": "index.js",
   "scripts": {
-    "deploy": "serverless deploy",
-    "deploy:prod": "serverless deploy --stage prod",
-    "remove": "serverless remove",
-    "invoke:extract": "serverless invoke --function extract",
-    "logs:extract": "serverless logs --function extract --tail",
-    "logs:transform": "serverless logs --function transform --tail"
+    "deploy": "npx serverless deploy",
+    "deploy:prod": "npx serverless deploy --stage prod",
+    "remove": "npx serverless remove",
+    "invoke:extract": "npx serverless invoke --function extract",
+    "invoke:transform": "npx serverless invoke --function transform",
+    "logs:extract": "npx serverless logs --function extract --tail",
+    "logs:transform": "npx serverless logs --function transform --tail",
+    "info": "npx serverless info"
   },
   "devDependencies": {
     "serverless": "^3.38.0",
