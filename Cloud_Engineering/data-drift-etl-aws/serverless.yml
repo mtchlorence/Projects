@@ -58,7 +58,7 @@ provider:
 custom:
   bucket_name: data-drift-${self:provider.stage}-${aws:accountId}
   pythonRequirements:
-    dockerizePip: true
+    dockerizePip: false  # ← DISABLED DOCKER
     useDownloadCache: true
     useStaticCache: true
 
