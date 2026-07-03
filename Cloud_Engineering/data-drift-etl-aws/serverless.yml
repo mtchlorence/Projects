@@ -105,7 +105,7 @@ resources:
     DataDriftGlueDatabase:
       Type: AWS::Glue::Database
       Properties:
-        CatalogId: ${aws:accountId}
+        CatalogId: !Ref AWS::AccountId
         DatabaseInput:
           Name: data_drift_db
           Description: Database for DataDrift ETL pipeline
@@ -120,7 +120,7 @@ resources:
         Description: Crawls processed CSV data for Athena queries
         Targets:
           S3Targets:
-            - Path: !Join ['', ['s3://', ${self:custom.bucket_name}, '/processed/']]
+            - Path: !Sub "s3://${self:custom.bucket_name}/processed/"
         Schedule:
           ScheduleExpression: cron(0 22 * * ? *)
         SchemaChangePolicy:
@@ -150,8 +150,8 @@ resources:
                     - s3:GetObject
                     - s3:ListBucket
                   Resource:
-                    - arn:aws:s3:::${self:custom.bucket_name}
-                    - arn:aws:s3:::${self:custom.bucket_name}/processed/*
+                    - !Sub "arn:aws:s3:::${self:custom.bucket_name}"
+                    - !Sub "arn:aws:s3:::${self:custom.bucket_name}/processed/*"
 
 plugins:
   - serverless-python-requirements
