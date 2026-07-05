@@ -44,6 +44,15 @@ PH_LOCATION_KEYWORDS = {
     "cebu",
     "davao",
 }
+GENERIC_MATCH_SKILLS = {
+    "api",
+    "cloud",
+    "etl",
+    "git",
+    "linux",
+    "monitoring",
+    "sql",
+}
 
 
 def _get_env_int(name: str, fallback: int) -> int:
@@ -63,6 +72,14 @@ def _get_timeout_seconds() -> int:
 
 def _get_result_limit() -> int:
     return _get_env_int("JOB_SEARCH_RESULT_LIMIT", 12)
+
+
+def _get_min_matched_skills() -> int:
+    return _get_env_int("JOB_SEARCH_MIN_MATCHED_SKILLS", 2)
+
+
+def _get_min_specific_skills() -> int:
+    return _get_env_int("JOB_SEARCH_MIN_SPECIFIC_SKILLS", 1)
 
 
 def _date_filter_enabled() -> bool:
@@ -121,6 +138,15 @@ def _active_listing_date() -> datetime:
 def _extract_skills_from_text(text: str) -> List[str]:
     lowered = text.lower()
     return sorted({skill for skill in SKILLS if skill in lowered})
+
+
+def _passes_relevance_filter(matched_skills: Iterable[str]) -> bool:
+    matched = {skill.lower() for skill in matched_skills}
+    specific_matches = matched - GENERIC_MATCH_SKILLS
+    return (
+        len(matched) >= _get_min_matched_skills()
+        and len(specific_matches) >= _get_min_specific_skills()
+    )
 
 
 def _normalize_remoteok_job(raw_job: Dict) -> Optional[Dict]:
@@ -608,7 +634,7 @@ def filter_and_rank_jobs(
 
         job_skills = {skill.lower() for skill in job.get("skills", [])}
         matched_skills = sorted(resume_skill_set.intersection(job_skills))
-        if not matched_skills:
+        if not _passes_relevance_filter(matched_skills):
             continue
 
         ranked_jobs.append(

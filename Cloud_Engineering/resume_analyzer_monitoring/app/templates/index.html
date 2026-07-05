@@ -34,7 +34,7 @@
                     <i class="fas fa-file-alt"></i> Resume Job Matcher
                 </h1>
                 <p class="hero-subtitle">
-                    Upload your resume, extract your skills, and find active Philippines-based jobs from the last 30 days.
+                    Upload your resume, extract your skills, and find Philippines-based jobs that match your profile.
                 </p>
             </section>
 
@@ -64,7 +64,7 @@
                                         <div class="upload-text">Drop your PDF here</div>
                                         <div class="upload-subtext">or click to browse</div>
                                         <div class="upload-note">
-                                            <i class="fas fa-file-pdf"></i> PDF files only · Max 16MB
+                                            <i class="fas fa-file-pdf"></i> PDF files only &middot; Max 16MB
                                         </div>
                                     </div>
 
@@ -102,7 +102,7 @@
                             <div class="text-center mt-4">
                                 <button type="submit" class="btn analyze-btn" id="analyzeBtn">
                                     <span class="btn-text">
-                                        <i class="fas fa-search"></i> Find Active Jobs
+                                        <i class="fas fa-search"></i> Analyze Resume
                                     </span>
                                     <span class="btn-spinner">
                                         <i class="fas fa-spinner fa-spin"></i> Analyzing...
@@ -117,6 +117,65 @@
             {% if results %}
                 {% set resume_skills = results.resume_skills | default([]) %}
 
+                {% if resume_guidance %}
+                    <section class="card app-card shadow-sm mb-4">
+                        <div class="card-body p-4 p-lg-5">
+                            <div class="result-question mb-4">
+                                <h5 class="mb-1 fw-bold">
+                                    <i class="fas fa-clipboard-check me-2"></i> What do I think of this resume?
+                                </h5>
+                                <p class="text-muted mb-0">
+                                    {{ resume_guidance.resume_review }}
+                                </p>
+                            </div>
+
+                            <div class="resume-guidance-grid">
+                                <div class="guidance-panel">
+                                    <h6><i class="fas fa-circle-check"></i> Strengths</h6>
+                                    <ul class="guidance-list">
+                                        {% for strength in resume_guidance.strengths %}
+                                            <li>{{ strength }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+
+                                <div class="guidance-panel">
+                                    <h6><i class="fas fa-arrow-trend-up"></i> Improve Next</h6>
+                                    <ul class="guidance-list">
+                                        {% for improvement in resume_guidance.improvements %}
+                                            <li>{{ improvement }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="card app-card shadow-sm mb-4">
+                        <div class="card-body p-4 p-lg-5">
+                            <div class="d-flex flex-column flex-md-row justify-content-between gap-3 mb-4">
+                                <div>
+                                    <h5 class="mb-1 fw-bold">
+                                        <i class="fas fa-route me-2"></i> What jobs should I target?
+                                    </h5>
+                                    <p class="text-muted mb-0">
+                                        {{ resume_guidance.job_search_focus }}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="role-list">
+                                {% for role in resume_guidance.recommended_roles %}
+                                    <article class="role-card">
+                                        <h6>{{ role.title }}</h6>
+                                        <p>{{ role.why }}</p>
+                                    </article>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </section>
+                {% endif %}
+
                 <section class="card app-card shadow-sm mb-4">
                     <div class="card-body p-4 p-lg-5">
                         <div class="d-flex flex-column flex-md-row justify-content-between gap-3 mb-4">
@@ -125,7 +184,7 @@
                                     <i class="fas fa-screwdriver-wrench me-2"></i> Extracted Resume Skills
                                 </h5>
                                 <p class="text-muted mb-0">
-                                    These skills are used to search and rank active job postings.
+                                    These skills are used to search and rank matching job postings.
                                 </p>
                             </div>
                             <a class="analyze-again-btn" href="/">
@@ -155,10 +214,10 @@
                         <div class="d-flex flex-column flex-md-row justify-content-between gap-3 mb-4">
                             <div>
                                 <h5 class="mb-1 fw-bold">
-                                    <i class="fas fa-briefcase me-2"></i> Active Jobs
+                                    <i class="fas fa-briefcase me-2"></i> What jobs should I apply to?
                                 </h5>
                                 <p class="text-muted mb-0">
-                                    Jobs located in the Philippines and posted within the last 30 days.
+                                    Jobs located in the Philippines and matched against your extracted resume skills.
                                 </p>
                             </div>
                             <span class="job-count">
@@ -213,7 +272,7 @@
                         {% elif not job_search_error and results %}
                             <p class="empty-skills-message mb-0">
                                 <i class="fas fa-info-circle"></i>
-                                No active jobs found for the extracted resume skills.
+                                No matching Philippines-based jobs found for the extracted resume skills.
                             </p>
                         {% endif %}
                     </div>
@@ -243,7 +302,7 @@
                     </span>
                 </div>
                 <div class="footer-note">
-                    <i class="fas fa-code"></i> DevOps · Cloud · AI Portfolio Project
+                    <i class="fas fa-code"></i> DevOps &middot; Cloud &middot; AI Portfolio Project
                 </div>
             </footer>
         </div>

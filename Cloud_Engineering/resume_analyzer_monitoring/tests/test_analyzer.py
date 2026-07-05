@@ -1,11 +1,13 @@
 from datetime import datetime, timedelta, timezone
 
+from ai_agent import build_resume_guidance
 from analyzer import analyze_resume
 from job_search import (
     _build_search_queries,
     _extract_company_jobs_from_page,
     _is_ph_based,
     _normalize_jsearch_job,
+    _passes_relevance_filter,
     fetch_company_site_jobs,
     fetch_jsearch_jobs,
     filter_and_rank_jobs,
@@ -32,6 +34,28 @@ def test_analyze_resume_empty_input():
     assert result["score"] == 0.0
     assert result["matched_skills"] == []
     assert result["missing_skills"] == []
+
+def test_analyze_resume_detects_cloud_terms():
+    result = analyze_resume("Cloud engineering and DevOps monitoring experience")
+
+    assert "cloud" in result["resume_skills"]
+    assert "cloud engineering" in result["resume_skills"]
+    assert "devops" in result["resume_skills"]
+
+def test_build_resume_guidance_fallback_answers_resume_questions(monkeypatch):
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+
+    guidance = build_resume_guidance(
+        "AWS Python Docker SQL resume with cloud monitoring projects",
+        ["aws", "python", "docker", "sql", "cloudwatch"],
+        {},
+    )
+
+    assert guidance["resume_review"]
+    assert guidance["strengths"]
+    assert guidance["improvements"]
+    assert guidance["recommended_roles"]
+    assert any("Cloud" in role["title"] for role in guidance["recommended_roles"])
 
 def test_filter_and_rank_jobs_ignores_old_jobs_when_date_filter_enabled(monkeypatch):
     monkeypatch.setenv("JOB_SEARCH_DATE_FILTER_ENABLED", "true")
@@ -71,6 +95,7 @@ def test_filter_and_rank_jobs_ignores_old_jobs_when_date_filter_enabled(monkeypa
 
 def test_filter_and_rank_jobs_keeps_old_jobs_when_date_filter_disabled(monkeypatch):
     monkeypatch.setenv("JOB_SEARCH_DATE_FILTER_ENABLED", "false")
+    monkeypatch.setenv("JOB_SEARCH_MIN_MATCHED_SKILLS", "2")
     now = datetime(2026, 7, 5, tzinfo=timezone.utc)
     jobs = [
         {
@@ -78,12 +103,12 @@ def test_filter_and_rank_jobs_keeps_old_jobs_when_date_filter_disabled(monkeypat
             "company": "Archive Inc",
             "location": "Makati, Philippines",
             "posted_date": now - timedelta(days=90),
-            "skills": ["python"],
+            "skills": ["python", "aws"],
             "is_ph_based": True,
         },
     ]
 
-    result = filter_and_rank_jobs(jobs, ["python"], now=now)
+    result = filter_and_rank_jobs(jobs, ["python", "aws"], now=now)
 
     assert len(result) == 1
     assert result[0]["title"] == "Old Python Developer"
@@ -96,7 +121,7 @@ def test_filter_and_rank_jobs_orders_ph_jobs_by_skill_match():
             "company": "Partial Match",
             "location": "Cebu, Philippines",
             "posted_date": now - timedelta(days=1),
-            "skills": ["python"],
+            "skills": ["python", "aws"],
             "is_ph_based": True,
         },
         {
@@ -219,3 +244,41 @@ def test_fetch_company_site_jobs_skips_when_no_urls(monkeypatch):
     monkeypatch.delenv("CAREER_SITE_URLS", raising=False)
 
     assert fetch_company_site_jobs(["cloud engineer"]) == []
+
+def test_relevance_filter_rejects_single_or_generic_matches(monkeypatch):
+    monkeypatch.setenv("JOB_SEARCH_MIN_MATCHED_SKILLS", "2")
+    monkeypatch.setenv("JOB_SEARCH_MIN_SPECIFIC_SKILLS", "1")
+
+    assert _passes_relevance_filter(["api", "cloud"]) is False
+    assert _passes_relevance_filter(["python"]) is False
+    assert _passes_relevance_filter(["python", "aws"]) is True
+    assert _passes_relevance_filter(["cloud", "cloud engineering"]) is True
+
+def test_filter_and_rank_jobs_excludes_weak_resume_matches(monkeypatch):
+    monkeypatch.setenv("JOB_SEARCH_DATE_FILTER_ENABLED", "false")
+    monkeypatch.setenv("JOB_SEARCH_MIN_MATCHED_SKILLS", "2")
+    monkeypatch.setenv("JOB_SEARCH_MIN_SPECIFIC_SKILLS", "1")
+    now = datetime(2026, 7, 5, tzinfo=timezone.utc)
+    jobs = [
+        {
+            "title": "Generic Support Analyst",
+            "company": "Weak Match Inc",
+            "location": "Manila, Philippines",
+            "posted_date": now,
+            "skills": ["api", "cloud"],
+            "is_ph_based": True,
+        },
+        {
+            "title": "AWS Cloud Engineer",
+            "company": "Strong Match Inc",
+            "location": "Taguig, Philippines",
+            "posted_date": now,
+            "skills": ["aws", "python", "cloud"],
+            "is_ph_based": True,
+        },
+    ]
+
+    result = filter_and_rank_jobs(jobs, ["api", "cloud", "aws", "python"], now=now)
+
+    assert len(result) == 1
+    assert result[0]["company"] == "Strong Match Inc"

@@ -4,10 +4,11 @@ import pdfplumber
 from typing import Optional, Dict, List, Tuple
 
 SKILLS = [
-    "python", "sql", "aws", "lambda", "s3", "docker", 
+    "python", "sql", "aws", "cloud", "cloud engineering",
+    "devops", "lambda", "s3", "docker", "serverless",
     "kubernetes", "terraform", "linux", "git", "jenkins",
-    "cloudwatch", "prometheus", "grafana", "power bi",
-    "athena", "glue", "api", "ci/cd", "ansible",
+    "cloudwatch", "monitoring", "prometheus", "grafana", "power bi",
+    "athena", "glue", "etl", "api", "ci/cd", "ansible",
     "jenkins", "azure", "gcp", "react", "angular",
     "node.js", "typescript", "javascript", "java", "c++",
     "postgresql", "mysql", "mongodb", "redis"

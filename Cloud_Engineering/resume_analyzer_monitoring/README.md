@@ -70,7 +70,7 @@ When `OPENAI_API_KEY` is configured, `app/ai_agent.py` can:
 
 ## Environment Variables
 
-Commit `.env.example` only. Keep real values in a local `.env`, Render environment variables, or GitHub Secrets.
+Use a local `.env` file for runtime configuration. Keep `.env` out of git because it may contain API keys and secrets.
 
 Important variables:
 
@@ -97,17 +97,13 @@ REMOTIVE_JOB_API_URL=https://remotive.com/api/remote-jobs?search={query}
 
 JOB_SEARCH_LOOKBACK_DAYS=30
 JOB_SEARCH_DATE_FILTER_ENABLED=false
+JOB_SEARCH_MIN_MATCHED_SKILLS=2
+JOB_SEARCH_MIN_SPECIFIC_SKILLS=1
 JOB_SEARCH_TIMEOUT_SECONDS=8
 JOB_SEARCH_RESULT_LIMIT=12
 ```
 
-Local setup:
-
-```bash
-cp .env.example .env
-```
-
-Then fill `.env` locally. The `.gitignore` file prevents `.env` from being committed.
+The `.gitignore` file prevents `.env` from being committed.
 
 ## Running Locally
 
@@ -180,7 +176,6 @@ resume_analyzer_monitoring/
 │   ├── conftest.py
 │   └── test_analyzer.py
 ├── .dockerignore
-├── .env.example
 ├── .gitignore
 ├── docker-compose.yml
 ├── Dockerfile

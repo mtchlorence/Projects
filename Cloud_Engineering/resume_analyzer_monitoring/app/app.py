@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from flask import Flask, render_template, request
 from prometheus_client import CONTENT_TYPE_LATEST, Counter, Histogram, generate_latest
 
+from ai_agent import build_resume_guidance
 from analyzer import analyze_resume
 from job_search import find_matching_jobs
 
@@ -64,11 +65,17 @@ def analyze():
             results.get("resume_skills", []),
             resume_text=results.get("resume_text", ""),
         )
+        resume_guidance = build_resume_guidance(
+            results.get("resume_text", ""),
+            results.get("resume_skills", []),
+            job_matches.get("candidate_profile", {}),
+        )
         ANALYSIS_SUCCESS.inc()
 
         return render_template(
             "index.html",
             results=results,
+            resume_guidance=resume_guidance,
             job_matches=job_matches.get("jobs", []),
             job_search_error=job_matches.get("error"),
             analyzed=True,
