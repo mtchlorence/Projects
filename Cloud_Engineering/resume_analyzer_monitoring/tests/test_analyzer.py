@@ -169,6 +169,25 @@ def test_filter_and_rank_jobs_excludes_non_ph_jobs():
     assert result[0]["company"] == "Manila Cloud"
     assert result[0]["is_ph_based"] is True
 
+
+def test_filter_and_rank_jobs_falls_back_to_relevant_non_ph_jobs():
+    now = datetime(2026, 7, 5, tzinfo=timezone.utc)
+    jobs = [
+        {
+            "title": "Cloud Engineer",
+            "company": "Example Corp",
+            "location": "Remote",
+            "posted_date": now - timedelta(days=1),
+            "skills": ["python", "aws"],
+            "is_ph_based": False,
+        }
+    ]
+
+    result = filter_and_rank_jobs(jobs, ["python", "aws"], now=now)
+
+    assert len(result) == 1
+    assert result[0]["title"] == "Cloud Engineer"
+
 def test_is_ph_based_uses_location_only_terms():
     assert _is_ph_based("Manila, Philippines") is True
     assert _is_ph_based("Taguig, PH") is True

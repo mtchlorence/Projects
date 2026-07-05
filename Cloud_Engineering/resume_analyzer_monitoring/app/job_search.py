@@ -677,6 +677,7 @@ def filter_and_rank_jobs(
     cutoff = now - timedelta(days=lookback_days)
     resume_skill_set = {skill.lower() for skill in resume_skills}
     ranked_jobs = []
+    ph_jobs = []
 
     for job in jobs:
         posted_date = job.get("posted_date")
@@ -686,24 +687,31 @@ def filter_and_rank_jobs(
         if _date_filter_enabled() and (not posted_date or posted_date < cutoff):
             continue
 
-        if not job.get("is_ph_based", False):
-            continue
-
         job_skills = {skill.lower() for skill in job.get("skills", [])}
         matched_skills = sorted(resume_skill_set.intersection(job_skills))
         if not _passes_relevance_filter(matched_skills):
             continue
 
-        ranked_jobs.append(
-            {
-                **job,
-                "posted_date": posted_date,
-                "posted_at": posted_date.strftime("%Y-%m-%d"),
-                "matched_skills": matched_skills,
-                "region_label": "Philippines",
-            }
-        )
+        normalized_job = {
+            **job,
+            "posted_date": posted_date,
+            "posted_at": posted_date.strftime("%Y-%m-%d") if posted_date else None,
+            "matched_skills": matched_skills,
+            "region_label": "Philippines" if job.get("is_ph_based", False) else "Remote/Other",
+        }
 
+        if job.get("is_ph_based", False):
+            ph_jobs.append(normalized_job)
+        else:
+            ranked_jobs.append(normalized_job)
+
+    ph_jobs.sort(
+        key=lambda item: (
+            len(item["matched_skills"]),
+            item["posted_date"],
+        ),
+        reverse=True,
+    )
     ranked_jobs.sort(
         key=lambda item: (
             len(item["matched_skills"]),
@@ -711,6 +719,9 @@ def filter_and_rank_jobs(
         ),
         reverse=True,
     )
+
+    if ph_jobs:
+        return ph_jobs[:limit]
     return ranked_jobs[:limit]
 
 
