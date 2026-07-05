@@ -77,3 +77,29 @@ def test_filter_and_rank_jobs_orders_by_skill_match():
         "Cloud Platform Engineer",
         "Python Engineer",
     ]
+
+def test_filter_and_rank_jobs_prioritizes_ph_friendly_jobs():
+    now = datetime(2026, 7, 5, tzinfo=timezone.utc)
+    jobs = [
+        {
+            "title": "Remote Python Engineer",
+            "company": "Global Remote",
+            "location": "Remote",
+            "posted_date": now - timedelta(days=1),
+            "skills": ["python", "aws"],
+            "is_ph_friendly": False,
+        },
+        {
+            "title": "Cloud Engineer",
+            "company": "Manila Cloud",
+            "location": "Manila, Philippines",
+            "posted_date": now - timedelta(days=2),
+            "skills": ["python", "aws"],
+            "is_ph_friendly": True,
+        },
+    ]
+
+    result = filter_and_rank_jobs(jobs, ["python", "aws"], now=now)
+
+    assert result[0]["company"] == "Manila Cloud"
+    assert result[0]["is_ph_friendly"] is True

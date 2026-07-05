@@ -10,6 +10,20 @@ import requests
 from analyzer import SKILLS
 
 
+PH_SEARCH_TERMS = ["philippines", "philippine", "manila", "ph"]
+PH_LOCATION_KEYWORDS = {
+    "philippines",
+    "philippine",
+    "manila",
+    "makati",
+    "taguig",
+    "quezon city",
+    "cebu",
+    "davao",
+    "ph",
+}
+
+
 def _get_env_int(name: str, fallback: int) -> int:
     try:
         return int(os.getenv(name, fallback))
@@ -34,6 +48,11 @@ def _get_timeout_seconds() -> int:
 
 def _get_result_limit() -> int:
     return _get_env_int("JOB_SEARCH_RESULT_LIMIT", 12)
+
+
+def _is_ph_friendly(*values: str) -> bool:
+    text = " ".join(value for value in values if value).lower()
+    return any(keyword in text for keyword in PH_LOCATION_KEYWORDS)
 
 
 def _parse_posted_date(value: Optional[str]) -> Optional[datetime]:
@@ -73,15 +92,25 @@ def _normalize_remoteok_job(raw_job: Dict) -> Dict:
     posted_at = raw_job.get("date") or raw_job.get("created_at")
     posted_date = _parse_posted_date(posted_at)
 
+    location = raw_job.get("location") or "Remote"
+    is_ph_friendly = _is_ph_friendly(
+        raw_job.get("position", ""),
+        raw_job.get("company", ""),
+        location,
+        description,
+    )
+
     return {
         "title": raw_job.get("position") or "Untitled role",
         "company": raw_job.get("company") or "Unknown company",
-        "location": raw_job.get("location") or "Remote",
+        "location": location,
         "url": raw_job.get("url") or raw_job.get("apply_url") or raw_job.get("source_url"),
         "posted_at": posted_at,
         "posted_date": posted_date,
         "skills": _extract_skills_from_text(description),
         "source": "Remote OK",
+        "is_ph_friendly": is_ph_friendly,
+        "region_label": "PH / Remote" if is_ph_friendly else "Remote",
     }
 
 
@@ -130,20 +159,18 @@ def filter_and_rank_jobs(
         if not matched_skills:
             continue
 
-        match_score = round((len(matched_skills) / max(len(resume_skill_set), 1)) * 100, 2)
         ranked_jobs.append(
             {
                 **job,
                 "posted_date": posted_date,
                 "posted_at": posted_date.strftime("%Y-%m-%d"),
                 "matched_skills": matched_skills,
-                "match_score": match_score,
             }
         )
 
     ranked_jobs.sort(
         key=lambda item: (
-            item["match_score"],
+            item.get("is_ph_friendly", False),
             len(item["matched_skills"]),
             item["posted_date"],
         ),
@@ -153,7 +180,7 @@ def filter_and_rank_jobs(
 
 
 def fetch_remoteok_jobs(skills: Iterable[str], timeout: Optional[int] = None) -> List[Dict]:
-    query_terms = list(skills)[:4] or ["python"]
+    query_terms = list(dict.fromkeys([*list(skills)[:4], *PH_SEARCH_TERMS])) or ["python"]
     timeout = timeout if timeout is not None else _get_timeout_seconds()
     api_url = _get_job_search_api_url()
     jobs = []

@@ -1,698 +1,60 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resume Skill Analyzer</title>
-    
-    <!-- Bootstrap 5 CSS -->
+    <title>Resume Job Matcher</title>
+
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
         rel="stylesheet"
     >
-    
-    <!-- Font Awesome 6 -->
     <link
         rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
     >
-    
-    <!-- Google Fonts (Inter) -->
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap"
         rel="stylesheet"
     >
-
     <link
         rel="stylesheet"
         href="{{ url_for('static', filename='styles.css') }}"
     >
-
-    <style>
-        /* ===== Base Styles ===== */
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #f8fafc;
-            color: #0f172a;
-        }
-
-        .app-wrapper {
-            min-height: 100vh;
-            padding: 2rem 0;
-        }
-
-        /* ===== Hero Section ===== */
-        .hero-section {
-            text-align: center;
-            margin-bottom: 2.5rem;
-        }
-
-        .hero-badge {
-            display: inline-block;
-            padding: 6px 18px;
-            border-radius: 999px;
-            background: #dbeafe;
-            color: #1d4ed8;
-            font-size: 0.8rem;
-            font-weight: 600;
-            letter-spacing: 0.3px;
-            text-transform: uppercase;
-        }
-
-        .hero-section h1 {
-            font-size: 2.5rem;
-            font-weight: 800;
-            color: #0f172a;
-            margin-top: 1rem;
-            margin-bottom: 0.75rem;
-        }
-
-        .hero-section h1 i {
-            color: #2563eb;
-        }
-
-        .hero-subtitle {
-            max-width: 640px;
-            margin: 0 auto;
-            color: #64748b;
-            font-size: 1.1rem;
-            line-height: 1.6;
-        }
-
-        /* ===== Cards ===== */
-        .app-card {
-            background: #ffffff;
-            border: 1px solid #e9edf4;
-            border-radius: 20px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-            transition: box-shadow 0.2s ease;
-        }
-
-        .app-card:hover {
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
-        }
-
-        /* ===== File Upload Area ===== */
-        .upload-area {
-            border: 2px dashed #d1d5db;
-            border-radius: 14px;
-            padding: 2rem 1.5rem;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            background: #fafbfc;
-            position: relative;
-        }
-
-        .upload-area:hover {
-            border-color: #2563eb;
-            background: #f0f4ff;
-        }
-
-        .upload-area.dragover {
-            border-color: #2563eb;
-            background: #eff6ff;
-            transform: scale(1.01);
-        }
-
-        .upload-area.has-file {
-            border-color: #22c55e;
-            background: #f0fdf4;
-        }
-
-        .upload-area .upload-icon {
-            font-size: 2.5rem;
-            color: #94a3b8;
-            margin-bottom: 0.75rem;
-        }
-
-        .upload-area .upload-text {
-            font-weight: 600;
-            color: #0f172a;
-        }
-
-        .upload-area .upload-subtext {
-            color: #94a3b8;
-            font-size: 0.85rem;
-        }
-
-        .upload-area .file-info {
-            display: none;
-            align-items: center;
-            justify-content: center;
-            gap: 0.75rem;
-        }
-
-        .upload-area.has-file .file-info {
-            display: flex;
-        }
-
-        .upload-area.has-file .upload-placeholder {
-            display: none;
-        }
-
-        .upload-area .file-info i {
-            font-size: 2rem;
-            color: #22c55e;
-        }
-
-        .upload-area .file-info .file-name {
-            font-weight: 600;
-            color: #0f172a;
-            word-break: break-all;
-        }
-
-        .upload-area .file-info .file-size {
-            color: #64748b;
-            font-size: 0.8rem;
-        }
-
-        .upload-area .remove-file {
-            background: none;
-            border: none;
-            color: #ef4444;
-            font-size: 1.2rem;
-            cursor: pointer;
-            padding: 0.25rem 0.5rem;
-            border-radius: 8px;
-            transition: background 0.2s;
-        }
-
-        .upload-area .remove-file:hover {
-            background: #fef2f2;
-        }
-
-        #resume_file_input {
-            display: none;
-        }
-
-        .toggle-input-btn {
-            background: none;
-            border: none;
-            color: #2563eb;
-            font-weight: 600;
-            cursor: pointer;
-            padding: 0.25rem 0.75rem;
-            border-radius: 8px;
-            transition: background 0.2s;
-            font-size: 0.85rem;
-        }
-
-        .toggle-input-btn:hover {
-            background: #eff6ff;
-        }
-
-        /* ===== Textarea ===== */
-        .resume-textarea-wrapper {
-            display: none;
-            margin-top: 0.75rem;
-        }
-
-        .resume-textarea-wrapper.active {
-            display: block;
-        }
-
-        .custom-textarea {
-            width: 100%;
-            min-height: 200px;
-            padding: 1rem 1.25rem;
-            border: 1.5px solid #e2e8f0;
-            border-radius: 14px;
-            background: #fafbfc;
-            color: #0f172a;
-            font-size: 0.95rem;
-            line-height: 1.6;
-            resize: vertical;
-            transition: border-color 0.2s, box-shadow 0.2s;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .custom-textarea:focus {
-            border-color: #2563eb;
-            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.10);
-            background: #ffffff;
-            outline: none;
-        }
-
-        .custom-textarea::placeholder {
-            color: #94a3b8;
-        }
-
-        .char-counter {
-            font-size: 0.8rem;
-            color: #94a3b8;
-            text-align: right;
-            margin-top: 0.4rem;
-            font-weight: 500;
-        }
-
-        /* ===== Analyze Button ===== */
-        .analyze-btn {
-            background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
-            border: none;
-            border-radius: 999px;
-            padding: 0.9rem 3rem;
-            font-weight: 700;
-            font-size: 1.05rem;
-            color: #ffffff;
-            transition: transform 0.2s, box-shadow 0.3s;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .analyze-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 35px rgba(37, 99, 235, 0.30);
-            color: #ffffff;
-        }
-
-        .analyze-btn:disabled {
-            opacity: 0.6;
-            transform: none;
-            cursor: not-allowed;
-        }
-
-        .analyze-btn i {
-            margin-right: 0.5rem;
-        }
-
-        .btn-spinner {
-            display: none;
-        }
-
-        .analyze-btn.loading .btn-text {
-            display: none;
-        }
-
-        .analyze-btn.loading .btn-spinner {
-            display: inline-block;
-        }
-
-        /* ===== Score Card ===== */
-        .score-card {
-            background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
-            border-radius: 18px;
-            padding: 1.75rem 1.5rem;
-            text-align: center;
-            color: #ffffff;
-            height: 100%;
-            box-shadow: 0 4px 20px rgba(37, 99, 235, 0.25);
-        }
-
-        .score-number {
-            font-size: 3.2rem;
-            font-weight: 800;
-            line-height: 1.2;
-        }
-
-        .score-label {
-            font-size: 0.9rem;
-            opacity: 0.85;
-            font-weight: 500;
-        }
-
-        .stat-card {
-            background: #ffffff;
-            border-radius: 16px;
-            padding: 1.5rem 1.25rem;
-            text-align: center;
-            height: 100%;
-            border: 1px solid #e9edf4;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
-        }
-
-        .stat-number {
-            font-size: 2.4rem;
-            font-weight: 800;
-            color: #0f172a;
-            line-height: 1.2;
-        }
-
-        .stat-number.text-success {
-            color: #16a34a;
-        }
-
-        .stat-number.text-danger {
-            color: #dc2626;
-        }
-
-        .stat-label {
-            color: #64748b;
-            font-size: 0.85rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.4px;
-            margin-top: 0.25rem;
-        }
-
-        .stat-card .stat-icon {
-            font-size: 1.5rem;
-            margin-bottom: 0.25rem;
-            display: block;
-        }
-
-        /* ===== Skill Sections ===== */
-        .skill-section {
-            background: #f8fafc;
-            border-radius: 16px;
-            padding: 1.25rem 1.5rem;
-            height: 100%;
-            border: 1px solid #f1f4f9;
-        }
-
-        .skill-section h6 {
-            font-weight: 700;
-            font-size: 0.95rem;
-            margin-bottom: 1rem;
-        }
-
-        .skill-section h6 i {
-            margin-right: 0.5rem;
-        }
-
-        .skill-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-        }
-
-        .skill-list li {
-            display: inline-block;
-            padding: 0.4rem 1.1rem;
-            border-radius: 999px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            border: 1px solid transparent;
-            transition: transform 0.15s;
-        }
-
-        .skill-list li:hover {
-            transform: scale(1.04);
-        }
-
-        .skill-list li.matched {
-            background: #dcfce7;
-            border-color: #86efac;
-            color: #166534;
-        }
-
-        .skill-list li.matched::before {
-            content: "✓ ";
-            font-weight: 700;
-        }
-
-        .skill-list li.missing {
-            background: #fee2e2;
-            border-color: #fca5a5;
-            color: #991b1b;
-        }
-
-        .skill-list li.missing::before {
-            content: "✗ ";
-            font-weight: 700;
-        }
-
-        .empty-skills-message {
-            color: #94a3b8;
-            font-size: 0.9rem;
-            margin-bottom: 0;
-        }
-
-        /* ===== Recommendation ===== */
-        .recommendation-box {
-            background: #eff6ff;
-            border-left: 5px solid #2563eb;
-            border-radius: 14px;
-            padding: 1.25rem 1.5rem;
-            color: #1e3a8a;
-        }
-
-        .recommendation-box i {
-            color: #2563eb;
-            margin-right: 0.6rem;
-            font-size: 1.1rem;
-        }
-
-        .recommendation-box strong {
-            font-weight: 700;
-        }
-
-        /* ===== Job Matches ===== */
-        .job-count {
-            align-self: flex-start;
-            background: #ecfeff;
-            border: 1px solid #a5f3fc;
-            border-radius: 999px;
-            color: #155e75;
-            font-size: 0.85rem;
-            font-weight: 700;
-            padding: 0.45rem 0.9rem;
-            white-space: nowrap;
-        }
-
-        .job-list {
-            display: grid;
-            gap: 1rem;
-        }
-
-        .job-card {
-            align-items: flex-start;
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 16px;
-            display: flex;
-            gap: 1rem;
-            justify-content: space-between;
-            padding: 1.2rem;
-        }
-
-        .job-card-main {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .job-title-row {
-            align-items: flex-start;
-            display: flex;
-            gap: 0.8rem;
-            justify-content: space-between;
-        }
-
-        .job-title-row h6 {
-            color: #0f172a;
-            font-size: 1rem;
-            font-weight: 800;
-            margin: 0;
-        }
-
-        .job-title-row span {
-            background: #dcfce7;
-            border-radius: 999px;
-            color: #166534;
-            font-size: 0.8rem;
-            font-weight: 800;
-            padding: 0.35rem 0.7rem;
-            white-space: nowrap;
-        }
-
-        .job-meta {
-            color: #64748b;
-            display: flex;
-            flex-wrap: wrap;
-            font-size: 0.85rem;
-            gap: 0.5rem 1rem;
-            margin: 0.7rem 0 0.9rem;
-        }
-
-        .job-meta i {
-            color: #2563eb;
-            margin-right: 0.25rem;
-        }
-
-        .job-skills li {
-            font-size: 0.78rem;
-            padding: 0.32rem 0.8rem;
-        }
-
-        .job-link {
-            background: #0f172a;
-            border-radius: 999px;
-            color: #ffffff;
-            flex: 0 0 auto;
-            font-size: 0.85rem;
-            font-weight: 700;
-            padding: 0.7rem 1rem;
-            text-decoration: none;
-            white-space: nowrap;
-        }
-
-        .job-link:hover {
-            background: #2563eb;
-            color: #ffffff;
-        }
-
-        /* ===== Error Alert ===== */
-        .alert-error {
-            background: #fef2f2;
-            border: 1px solid #fca5a5;
-            color: #991b1b;
-            border-radius: 14px;
-            padding: 1rem 1.25rem;
-        }
-
-        /* ===== Footer ===== */
-        .footer {
-            text-align: center;
-            padding: 2rem 0 0.5rem;
-            margin-top: 2.5rem;
-            border-top: 1px solid #e9edf4;
-            color: #94a3b8;
-            font-size: 0.9rem;
-        }
-
-        .footer a {
-            color: #475569;
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.2s;
-        }
-
-        .footer a:hover {
-            color: #2563eb;
-        }
-
-        .footer i {
-            margin: 0 0.2rem;
-        }
-
-        .footer .tech-stack {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 0.75rem 1.5rem;
-            margin-top: 0.5rem;
-        }
-
-        .footer .tech-stack span {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
-        }
-
-        .footer .tech-stack i {
-            font-size: 1rem;
-        }
-
-        /* ===== Responsive ===== */
-        @media (max-width: 768px) {
-            .hero-section h1 {
-                font-size: 1.8rem;
-            }
-
-            .hero-subtitle {
-                font-size: 0.95rem;
-            }
-
-            .score-number {
-                font-size: 2.4rem;
-            }
-
-            .stat-number {
-                font-size: 1.8rem;
-            }
-
-            .custom-textarea {
-                min-height: 150px;
-            }
-
-            .analyze-btn {
-                width: 100%;
-                justify-content: center;
-            }
-
-            .footer .tech-stack {
-                flex-direction: column;
-                align-items: center;
-                gap: 0.4rem;
-            }
-
-            .upload-area {
-                padding: 1.5rem 1rem;
-            }
-
-            .job-card,
-            .job-title-row {
-                flex-direction: column;
-            }
-
-            .job-title-row span,
-            .job-link {
-                white-space: normal;
-            }
-        }
-
-        @media (max-width: 576px) {
-            .app-wrapper {
-                padding: 1rem 0;
-            }
-
-            .hero-section h1 {
-                font-size: 1.5rem;
-            }
-
-            .score-card {
-                padding: 1.25rem;
-            }
-
-            .score-number {
-                font-size: 2rem;
-            }
-        }
-    </style>
-
 </head>
 
 <body>
-
     <div class="app-wrapper">
-
         <div class="container">
-
-            <!-- ===== HERO SECTION ===== -->
             <section class="hero-section">
                 <span class="hero-badge">
                     <i class="fas fa-rocket me-1"></i> DevOps + AI Portfolio Project
                 </span>
-
                 <h1>
-                    <i class="fas fa-file-alt"></i> Resume Skill Analyzer
+                    <i class="fas fa-file-alt"></i> Resume Job Matcher
                 </h1>
-
                 <p class="hero-subtitle">
-                    Upload your resume (PDF) or paste text to analyze your skills, then discover
-                    matching active job postings from the last 30 days.
+                    Upload your resume, extract your skills, and find active remote and Philippines-friendly jobs from the last 30 days.
                 </p>
             </section>
 
-            <!-- ===== INPUT FORM ===== -->
-            <section class="card app-card shadow-sm mb-4">
-                <div class="card-body p-4 p-lg-5">
+            {% if error %}
+                <div class="alert-error mb-4">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    {{ error }}
+                </div>
+            {% endif %}
 
-                    <form action="/analyze" method="POST" id="analyzeForm" enctype="multipart/form-data">
-
-                        <div class="row g-4">
-
-                            <!-- Resume Input -->
-                            <div class="col-lg-6">
+            {% if not analyzed %}
+                <section class="card app-card shadow-sm mb-4">
+                    <div class="card-body p-4 p-lg-5">
+                        <form action="/analyze" method="POST" id="analyzeForm" enctype="multipart/form-data">
+                            <div class="resume-input-panel">
                                 <label class="form-label fw-semibold">
                                     <i class="fas fa-user me-1"></i> Resume
                                 </label>
 
-                                <!-- File Upload Area -->
-                                <div class="upload-area {% if resume_filename %}has-file{% endif %}" id="uploadArea">
+                                <div class="upload-area" id="uploadArea">
                                     <input type="file" id="resume_file_input" name="resume_file" accept=".pdf">
 
                                     <div class="upload-placeholder">
@@ -701,7 +63,7 @@
                                         </div>
                                         <div class="upload-text">Drop your PDF here</div>
                                         <div class="upload-subtext">or click to browse</div>
-                                        <div class="upload-subtext" style="margin-top: 0.5rem; font-size: 0.75rem; color: #94a3b8;">
+                                        <div class="upload-note">
                                             <i class="fas fa-file-pdf"></i> PDF files only · Max 16MB
                                         </div>
                                     </div>
@@ -709,13 +71,7 @@
                                     <div class="file-info">
                                         <i class="fas fa-file-pdf"></i>
                                         <div>
-                                            <div class="file-name" id="fileName">
-                                                {% if resume_filename %}
-                                                    {{ resume_filename }}
-                                                {% else %}
-                                                    resume.pdf
-                                                {% endif %}
-                                            </div>
+                                            <div class="file-name" id="fileName">resume.pdf</div>
                                             <div class="file-size" id="fileSize">0 KB</div>
                                         </div>
                                         <button type="button" class="remove-file" id="removeFile" title="Remove file">
@@ -724,14 +80,12 @@
                                     </div>
                                 </div>
 
-                                <!-- Toggle to text input -->
                                 <div class="mt-2 text-end">
                                     <button type="button" class="toggle-input-btn" id="toggleResumeInput">
                                         <i class="fas fa-edit"></i> Or paste text instead
                                     </button>
                                 </div>
 
-                                <!-- Textarea (hidden by default) -->
                                 <div class="resume-textarea-wrapper" id="resumeTextareaWrapper">
                                     <textarea
                                         class="form-control custom-textarea"
@@ -740,174 +94,71 @@
                                         rows="8"
                                         placeholder="Paste your resume text here..."
                                         maxlength="5000"
-                                    >{{ resume if resume else '' }}</textarea>
-                                    <div class="char-counter" id="resumeCount">
-                                        {{ resume|length if resume else 0 }} / 5000
-                                    </div>
+                                    ></textarea>
+                                    <div class="char-counter" id="resumeCount">0 / 5000</div>
                                 </div>
                             </div>
 
-                            <!-- Optional Job Description -->
-                            <div class="col-lg-6">
-                                <label for="job_description" class="form-label fw-semibold">
-                                    <i class="fas fa-briefcase me-1"></i> Job Description
-                                    <span class="text-muted fw-normal">(optional)</span>
-                                </label>
-
-                                <textarea
-                                    class="form-control custom-textarea"
-                                    id="job_description"
-                                    name="job_description"
-                                    rows="10"
-                                    placeholder="Paste a specific job description here if you want a fit score for one role. Leave blank to only search live matching jobs."
-                                    maxlength="5000"
-                                >{{ job_description if job_description else '' }}</textarea>
-
-                                <div class="char-counter" id="jobCount">
-                                    {{ job_description|length if job_description else 0 }} / 5000
-                                </div>
+                            <div class="text-center mt-4">
+                                <button type="submit" class="btn analyze-btn" id="analyzeBtn">
+                                    <span class="btn-text">
+                                        <i class="fas fa-search"></i> Find Active Jobs
+                                    </span>
+                                    <span class="btn-spinner">
+                                        <i class="fas fa-spinner fa-spin"></i> Analyzing...
+                                    </span>
+                                </button>
                             </div>
-
-                        </div>
-
-                        <!-- Submit Button -->
-                        <div class="text-center mt-4">
-                            <button type="submit" class="btn analyze-btn" id="analyzeBtn">
-                                <span class="btn-text">
-                                    <i class="fas fa-chart-line"></i> Analyze Resume + Find Jobs
-                                </span>
-                                <span class="btn-spinner">
-                                    <i class="fas fa-spinner fa-spin"></i> Analyzing...
-                                </span>
-                            </button>
-                        </div>
-
-                    </form>
-
-                </div>
-            </section>
-
-            <!-- ===== ERROR MESSAGE ===== -->
-            {% if error %}
-                <div class="alert-error mb-4">
-                    <i class="fas fa-exclamation-circle me-2"></i>
-                    {{ error }}
-                </div>
+                        </form>
+                    </div>
+                </section>
             {% endif %}
 
-            <!-- ===== RESULTS SECTION ===== -->
             {% if results %}
+                {% set resume_skills = results.resume_skills | default([]) %}
 
-                {% set score = results.score | default(0) %}
-                {% set matched = results.matched_skills | default([]) %}
-                {% set missing = results.missing_skills | default([]) %}
-
-                <!-- Metrics Row -->
-                <section class="row g-4 mb-4">
-
-                    <div class="col-md-4">
-                        <div class="score-card">
-                            <div class="score-number">{{ score }}%</div>
-                            <div class="score-label">Match Score</div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-4">
-                        <div class="stat-card">
-                            <span class="stat-icon text-success">
-                                <i class="fas fa-check-circle"></i>
-                            </span>
-                            <div class="stat-number text-success">{{ matched | length }}</div>
-                            <div class="stat-label">Matched Skills</div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-4">
-                        <div class="stat-card">
-                            <span class="stat-icon text-danger">
-                                <i class="fas fa-exclamation-circle"></i>
-                            </span>
-                            <div class="stat-number text-danger">{{ missing | length }}</div>
-                            <div class="stat-label">Missing Skills</div>
-                        </div>
-                    </div>
-
-                </section>
-
-                <!-- Skills Detail -->
-                <section class="row g-4">
-
-                    <div class="col-md-6">
-                        <div class="skill-section">
-                            <h6 class="text-success">
-                                <i class="fas fa-check-circle"></i> Matched Skills
-                            </h6>
-
-                            {% if matched %}
-                                <ul class="skill-list">
-                                    {% for skill in matched %}
-                                        <li class="matched">{{ skill }}</li>
-                                    {% endfor %}
-                                </ul>
-                            {% else %}
-                                <p class="empty-skills-message">
-                                    <i class="fas fa-info-circle"></i> No matching skills found.
+                <section class="card app-card shadow-sm mb-4">
+                    <div class="card-body p-4 p-lg-5">
+                        <div class="d-flex flex-column flex-md-row justify-content-between gap-3 mb-4">
+                            <div>
+                                <h5 class="mb-1 fw-bold">
+                                    <i class="fas fa-screwdriver-wrench me-2"></i> Extracted Resume Skills
+                                </h5>
+                                <p class="text-muted mb-0">
+                                    These skills are used to search and rank active job postings.
                                 </p>
-                            {% endif %}
+                            </div>
+                            <a class="analyze-again-btn" href="/">
+                                <i class="fas fa-rotate-left"></i> Analyze Again
+                            </a>
                         </div>
+
+                        {% if resume_skills %}
+                            <ul class="skill-list">
+                                {% for skill in resume_skills %}
+                                    <li class="matched">{{ skill }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p class="empty-skills-message">
+                                <i class="fas fa-info-circle"></i>
+                                No known skills were detected from this resume.
+                            </p>
+                        {% endif %}
                     </div>
-
-                    <div class="col-md-6">
-                        <div class="skill-section">
-                            <h6 class="text-danger">
-                                <i class="fas fa-exclamation-circle"></i> Missing Skills
-                            </h6>
-
-                            {% if missing %}
-                                <ul class="skill-list">
-                                    {% for skill in missing %}
-                                        <li class="missing">{{ skill }}</li>
-                                    {% endfor %}
-                                </ul>
-                            {% else %}
-                                <p class="empty-skills-message">
-                                    <i class="fas fa-check-circle"></i> No missing skills detected.
-                                </p>
-                            {% endif %}
-                        </div>
-                    </div>
-
                 </section>
-
-                <!-- Recommendation -->
-                <section class="recommendation-box mt-4">
-                    <i class="fas fa-lightbulb"></i>
-                    <strong>Recommendation:</strong>
-
-                    {% if not results.job_skills %}
-                        Add a specific job description if you want a role-by-role fit score. Your resume skills are still being used to find fresh matching postings below.
-                    {% elif score >= 80 %}
-                        Your skills align very well with this role. You're a strong candidate — proceed with confidence!
-                    {% elif score >= 60 %}
-                        You have a solid foundation. Focus on the missing skills above to strengthen your profile before applying.
-                    {% else %}
-                        Several skill gaps were identified. Prioritize the missing technologies before applying.
-                    {% endif %}
-                </section>
-
             {% endif %}
 
-            <!-- ===== MATCHING JOBS SECTION ===== -->
             {% if job_matches is defined or job_search_error %}
                 <section class="card app-card shadow-sm mt-4">
                     <div class="card-body p-4 p-lg-5">
                         <div class="d-flex flex-column flex-md-row justify-content-between gap-3 mb-4">
                             <div>
                                 <h5 class="mb-1 fw-bold">
-                                    <i class="fas fa-search me-2"></i> Active Job Matches
+                                    <i class="fas fa-briefcase me-2"></i> Active Jobs
                                 </h5>
                                 <p class="text-muted mb-0">
-                                    Ranked by your resume skills and limited to postings from the last 30 days.
+                                    Remote and Philippines-friendly roles posted within the last 30 days.
                                 </p>
                             </div>
                             <span class="job-count">
@@ -929,7 +180,15 @@
                                         <div class="job-card-main">
                                             <div class="job-title-row">
                                                 <h6>{{ job.title }}</h6>
-                                                <span>{{ job.match_score }}% skill match</span>
+                                                {% if job.is_ph_friendly %}
+                                                    <span class="region-badge ph-badge">
+                                                        <i class="fas fa-location-dot"></i> PH-friendly
+                                                    </span>
+                                                {% else %}
+                                                    <span class="region-badge">
+                                                        <i class="fas fa-globe"></i> Remote
+                                                    </span>
+                                                {% endif %}
                                             </div>
                                             <div class="job-meta">
                                                 <span><i class="fas fa-building"></i> {{ job.company }}</span>
@@ -954,50 +213,44 @@
                         {% elif not job_search_error and results %}
                             <p class="empty-skills-message mb-0">
                                 <i class="fas fa-info-circle"></i>
-                                No active job matches found for the extracted resume skills.
+                                No active jobs found for the extracted resume skills.
                             </p>
                         {% endif %}
                     </div>
                 </section>
             {% endif %}
 
-            <!-- ===== FOOTER ===== -->
             <footer class="footer">
                 <div class="tech-stack">
                     <span>
-                        Built with <i class="fas fa-heart" style="color: #ef4444;"></i>
+                        Built with <i class="fas fa-heart footer-heart"></i>
                     </span>
                     <span>
-                        <i class="fab fa-python" style="color: #3776AB;"></i>
+                        <i class="fab fa-python footer-python"></i>
                         <a href="#">Flask</a>
                     </span>
                     <span>
-                        <i class="fab fa-docker" style="color: #2496ED;"></i>
+                        <i class="fab fa-docker footer-docker"></i>
                         Docker
                     </span>
                     <span>
-                        <i class="fas fa-chart-line" style="color: #e6522c;"></i>
+                        <i class="fas fa-chart-line footer-prometheus"></i>
                         Prometheus
                     </span>
                     <span>
-                        <i class="fas fa-chart-pie" style="color: #F46825;"></i>
+                        <i class="fas fa-chart-pie footer-grafana"></i>
                         Grafana
                     </span>
                 </div>
-                <div style="margin-top: 0.75rem; font-size: 0.8rem;">
+                <div class="footer-note">
                     <i class="fas fa-code"></i> DevOps · Cloud · AI Portfolio Project
                 </div>
             </footer>
-
         </div>
-
     </div>
 
-    <!-- ===== JAVASCRIPT ===== -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-
-            // ----- File Upload Logic -----
             const uploadArea = document.getElementById('uploadArea');
             const fileInput = document.getElementById('resume_file_input');
             const fileName = document.getElementById('fileName');
@@ -1008,22 +261,16 @@
             const analyzeBtn = document.getElementById('analyzeBtn');
             const analyzeForm = document.getElementById('analyzeForm');
 
-            // Check if file already exists from session (after analysis)
-            if (fileName && fileName.textContent !== 'resume.pdf' && uploadArea) {
-                uploadArea.classList.add('has-file');
-                if (fileSize) {
-                    fileSize.textContent = 'Uploaded';
-                }
+            if (!uploadArea || !fileInput || !analyzeForm) {
+                return;
             }
 
-            // Click to browse
             uploadArea.addEventListener('click', function(e) {
                 if (!e.target.closest('.remove-file')) {
                     fileInput.click();
                 }
             });
 
-            // Drag and drop
             uploadArea.addEventListener('dragover', function(e) {
                 e.preventDefault();
                 this.classList.add('dragover');
@@ -1037,121 +284,74 @@
             uploadArea.addEventListener('drop', function(e) {
                 e.preventDefault();
                 this.classList.remove('dragover');
-                const files = e.dataTransfer.files;
-                if (files.length > 0) {
-                    handleFile(files[0]);
+                if (e.dataTransfer.files.length > 0) {
+                    handleFile(e.dataTransfer.files[0]);
                 }
             });
 
-            // File input change
             fileInput.addEventListener('change', function() {
                 if (this.files.length > 0) {
                     handleFile(this.files[0]);
                 }
             });
 
-            // Handle file selection
             function handleFile(file) {
-                // Validate file type
                 if (file.type !== 'application/pdf') {
                     alert('Please upload a PDF file.');
                     fileInput.value = '';
                     return;
                 }
 
-                // Validate file size (16MB)
                 if (file.size > 16 * 1024 * 1024) {
                     alert('File is too large. Maximum size is 16MB.');
                     fileInput.value = '';
                     return;
                 }
 
-                // Update UI
                 uploadArea.classList.add('has-file');
                 fileName.textContent = file.name;
                 fileSize.textContent = (file.size / 1024).toFixed(1) + ' KB';
-
-                // Hide textarea if visible
                 textareaWrapper.classList.remove('active');
                 toggleBtn.innerHTML = '<i class="fas fa-edit"></i> Or paste text instead';
             }
 
-            // Remove file
             removeFileBtn.addEventListener('click', function(e) {
                 e.stopPropagation();
+                clearFile();
+            });
+
+            function clearFile() {
                 fileInput.value = '';
                 uploadArea.classList.remove('has-file');
                 fileName.textContent = 'resume.pdf';
                 fileSize.textContent = '0 KB';
+            }
 
-                // Add hidden input to tell backend to clear session
-                let clearInput = document.getElementById('clearFile');
-                if (!clearInput) {
-                    clearInput = document.createElement('input');
-                    clearInput.type = 'hidden';
-                    clearInput.name = 'clear_file';
-                    clearInput.id = 'clearFile';
-                    clearInput.value = 'true';
-                    analyzeForm.appendChild(clearInput);
-                } else {
-                    clearInput.value = 'true';
-                }
-
-                // Show textarea if it was active
-                if (textareaWrapper.classList.contains('active')) {
-                    // Keep it active
-                } else {
-                    toggleBtn.click();
-                }
-            });
-
-            // Toggle between file upload and text input
             toggleBtn.addEventListener('click', function() {
                 textareaWrapper.classList.toggle('active');
                 if (textareaWrapper.classList.contains('active')) {
                     this.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Upload PDF instead';
-                    // Clear file if present
-                    if (uploadArea.classList.contains('has-file')) {
-                        fileInput.value = '';
-                        uploadArea.classList.remove('has-file');
-                        fileName.textContent = 'resume.pdf';
-                        fileSize.textContent = '0 KB';
-                    }
+                    clearFile();
                 } else {
                     this.innerHTML = '<i class="fas fa-edit"></i> Or paste text instead';
                 }
             });
 
-            // ----- Character Counters -----
-            const textareas = document.querySelectorAll('textarea[maxlength]');
-            textareas.forEach(textarea => {
-                const counterId = textarea.id + 'Count';
-                const counter = document.getElementById(counterId);
+            const resumeTextarea = document.getElementById('resume');
+            const resumeCounter = document.getElementById('resumeCount');
+            if (resumeTextarea && resumeCounter) {
+                resumeTextarea.addEventListener('input', function() {
+                    resumeCounter.textContent = this.value.length + ' / ' + this.maxLength;
+                    this.style.height = 'auto';
+                    this.style.height = Math.min(this.scrollHeight, 400) + 'px';
+                });
+            }
 
-                if (counter) {
-                    textarea.addEventListener('input', function() {
-                        const count = this.value.length;
-                        counter.textContent = count + ' / ' + this.maxLength;
-                    });
-                }
-            });
-
-            // ----- Form Submit Loading State -----
             analyzeForm.addEventListener('submit', function() {
                 analyzeBtn.classList.add('loading');
                 analyzeBtn.disabled = true;
             });
-
-            // ----- Auto-resize textareas -----
-            document.querySelectorAll('.custom-textarea').forEach(textarea => {
-                textarea.addEventListener('input', function() {
-                    this.style.height = 'auto';
-                    this.style.height = Math.min(this.scrollHeight, 400) + 'px';
-                });
-            });
-
         });
     </script>
-
 </body>
 </html>

@@ -61,7 +61,7 @@ def extract_text_from_pdf(file_bytes: bytes, method: str = "pdfplumber") -> str:
 
 # ----- Analysis Functions -----
 
-def analyze_resume_text(resume_text: str, job_description: str) -> Dict:
+def analyze_resume_text(resume_text: str, job_description: str = "") -> Dict:
     """
     Analyze resume text against job description.
     
@@ -110,7 +110,7 @@ def analyze_resume_text(resume_text: str, job_description: str) -> Dict:
 
 def analyze_resume(
     resume_source: str, 
-    job_description: str,
+    job_description: str = "",
     is_file: bool = False,
     file_bytes: Optional[bytes] = None
 ) -> Dict:
