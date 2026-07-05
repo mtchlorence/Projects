@@ -29,14 +29,12 @@ Hi! I'm Mitch — a passionate **Cloud & Data Engineer** on a mission to build p
 - 🛠️ **Tech Stack:** AWS Lambda · S3 · Glue · Athena · EventBridge · Serverless Framework
 
 <!-- #### [**Medallion Lakehouse**](https://github.com/mtchlorence/medallion) *(Coming Soon)*
-*Built like Aki's blanket fort — carefully structured, perfectly layered*
 - ✅ Medallion Architecture (Bronze → Silver → Gold)
 - ✅ Infrastructure as Code with Terraform
 - ✅ Scalable ETL with AWS Glue (Spark)
 - 🛠️ **Tech Stack:** AWS Glue · S3 · Athena · Terraform · Power BI
 
 #### [**Serverless Web App**](https://github.com/mtchlorence/webapp) *(Coming Soon)*
-*Inspired by Aki's lightning-fast reflexes ⚡*
 - ✅ Event-driven architecture with Lambda + S3 + DynamoDB
 - ✅ Real-time file processing and logging
 - 🛠️ **Tech Stack:** AWS Lambda · S3 · DynamoDB · API Gateway · CloudWatch -->
