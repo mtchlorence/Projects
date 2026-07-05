@@ -12,7 +12,7 @@ from job_search import find_matching_jobs
 load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = os.getenv("SECRET_KEY") or "dev-secret-key-change-in-production"
+app.secret_key = os.getenv("SECRET_KEY")
 app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024
 
 ANALYSIS_TOTAL = Counter("resume_analysis_total", "Total number of resume analyses performed")
@@ -43,12 +43,14 @@ def analyze():
         if resume_file and resume_file.filename and allowed_file(resume_file.filename):
             results = analyze_resume(
                 resume_source="",
+                job_description="",
                 is_file=True,
                 file_bytes=resume_file.read(),
             )
         elif resume_text:
             results = analyze_resume(
                 resume_source=resume_text,
+                job_description="",
                 is_file=False,
             )
         else:
@@ -58,7 +60,10 @@ def analyze():
             )
 
         JOB_MATCH_TOTAL.inc()
-        job_matches = find_matching_jobs(results.get("resume_skills", []))
+        job_matches = find_matching_jobs(
+            results.get("resume_skills", []),
+            resume_text=results.get("resume_text", ""),
+        )
         ANALYSIS_SUCCESS.inc()
 
         return render_template(

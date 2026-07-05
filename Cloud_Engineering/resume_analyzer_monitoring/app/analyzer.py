@@ -105,7 +105,8 @@ def analyze_resume_text(resume_text: str, job_description: str = "") -> Dict:
         "matched_skills": sorted(matched_skills),
         "missing_skills": sorted(missing_skills),
         "job_skills": sorted(job_skills),
-        "resume_skills": sorted(resume_skills)
+        "resume_skills": sorted(resume_skills),
+        "resume_text": resume_text,
     }
 
 def analyze_resume(

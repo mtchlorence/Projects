@@ -1,53 +1,105 @@
-# 🧠 Resume Skill Analyzer
+# Resume PH Job Matcher
 
 [![Live Demo](https://img.shields.io/badge/Live-Demo-2563eb?style=for-the-badge&logo=render&logoColor=white)](https://projects-h5c3.onrender.com/)
 [![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://hub.docker.com/r/mlorence/resume-analyzer)
 [![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
 
-> A DevOps-powered resume analyzer that compares your resume against job descriptions, identifies skill gaps, and provides actionable recommendations.
+A Flask portfolio app that accepts a resume, extracts skills, and discovers Philippines-based jobs that match the candidate profile.
 
----
+## Features
 
-## 🚀 Live Demo
+- PDF resume upload with drag-and-drop support
+- Resume text paste fallback
+- PDF text extraction with `pdfplumber`
+- Skill extraction from a configurable skill list
+- Philippines-only job filtering
+- Optional AI-assisted search-query generation and job match explanations
+- Configurable job providers:
+  - Public company career sites from `CAREER_SITE_URLS`
+  - JSearch / RapidAPI
+  - Remote OK
+  - Remotive
+- Prometheus metrics endpoint at `/metrics`
+- Docker and Docker Compose support
 
-**Try it now:** [https://projects-h5c3.onrender.com/](https://projects-h5c3.onrender.com/)
+## App Flow
 
-Upload a PDF resume or paste text, add a job description, and get instant feedback on your skill match.
+1. User uploads a PDF resume or pastes resume text.
+2. Flask extracts resume text and known skills.
+3. The optional AI layer builds better Philippines-focused job search queries.
+4. Job providers fetch candidate jobs.
+5. The app removes non-Philippines jobs.
+6. Date filtering is optional and currently off by default.
+7. Jobs are ranked by matched skills and recency.
+8. The results page shows extracted skills, job cards, and optional AI match reasons.
 
----
+Uploaded files are not persisted. They are read during the request only.
 
-## ✨ Features
+## Job Discovery
 
-- **📄 PDF Resume Upload** - Drag-and-drop or click to upload PDF files
-- **📝 Text Input Option** - Paste resume text directly
-- **🔍 Skill Matching** - Compares your skills against job requirements
-- **💼 Live Job Matching** - Finds active Remote OK postings from the last 30 days that match your resume skills
-- **📊 Match Score** - Visual percentage score with color-coded feedback
-- **✅ Matched Skills** - See which skills you already have
-- **❌ Missing Skills** - Identify skill gaps to focus on
-- **💡 Recommendations** - Actionable advice based on your match score
-- **📱 Responsive UI** - Works on desktop, tablet, and mobile
+The app does not scrape LinkedIn, JobStreet, or Indeed directly. Instead, it uses safer provider adapters:
 
----
+- `company_sites`: crawls only configured public company career URLs, follows same-domain career/job links, and respects `robots.txt` by default.
+- `jsearch`: uses JSearch/RapidAPI when `JSEARCH_API_KEY` is configured.
+- `remoteok` and `remotive`: fallback public remote-job providers.
 
-### Job Matching
+Example company career-site setup:
 
-When you upload a resume or paste resume text, the app extracts known skills from your resume, searches Remote OK for matching roles, filters out postings older than 30 days, and ranks the remaining jobs by skill overlap. Set `JOB_SEARCH_ENABLED=false` to disable live job matching in local or offline environments.
+```env
+JOB_SEARCH_PROVIDERS=company_sites,jsearch,remoteok,remotive
+CAREER_SITE_URLS=https://careers.dxc.com/search-jobs/Philippines;https://www.accenture.com/ph-en/careers/jobsearch
+CAREER_SITE_MAX_PAGES=16
+CAREER_SITES_RESPECT_ROBOTS=true
+```
 
----
+To test one job page directly:
 
-### Environment Variables and Secrets
+```env
+CAREER_SITE_URLS=https://careers.dxc.com/job/23409628/analyst-ii-cloud-engineering-taguig-city-ph/
+```
 
-Commit `.env.example` only. Keep real values in a local `.env` file, Render environment variables, or GitHub Actions repository secrets.
+## AI Layer
 
-Recommended GitHub Secrets:
+The app works without OpenAI credentials. If `OPENAI_API_KEY` is missing, it falls back to deterministic skill-based matching.
 
-- `SECRET_KEY`
-- `JOB_SEARCH_ENABLED`
-- `JOB_SEARCH_API_URL`
-- `JOB_SEARCH_LOOKBACK_DAYS`
-- `JOB_SEARCH_TIMEOUT_SECONDS`
-- `JOB_SEARCH_RESULT_LIMIT`
+When `OPENAI_API_KEY` is configured, `app/ai_agent.py` can:
+
+- summarize the candidate profile
+- generate better Philippines-focused search queries
+- enrich jobs with short "why this matches" explanations
+
+## Environment Variables
+
+Commit `.env.example` only. Keep real values in a local `.env`, Render environment variables, or GitHub Secrets.
+
+Important variables:
+
+```env
+SECRET_KEY=
+OPENAI_API_KEY=
+AI_JOB_AGENT_ENABLED=true
+OPENAI_MODEL=gpt-4.1-mini
+
+JOB_SEARCH_ENABLED=true
+JOB_SEARCH_COUNTRY=philippines
+JOB_SEARCH_PROVIDERS=company_sites,jsearch,remoteok,remotive
+
+CAREER_SITE_URLS=
+CAREER_SITE_MAX_PAGES=16
+CAREER_SITES_RESPECT_ROBOTS=true
+
+JSEARCH_API_KEY=
+JSEARCH_API_URL=https://jsearch.p.rapidapi.com/search
+JSEARCH_API_HOST=jsearch.p.rapidapi.com
+
+REMOTEOK_JOB_API_URL=https://remoteok.com/remote-{query}-jobs.json
+REMOTIVE_JOB_API_URL=https://remotive.com/api/remote-jobs?search={query}
+
+JOB_SEARCH_LOOKBACK_DAYS=30
+JOB_SEARCH_DATE_FILTER_ENABLED=false
+JOB_SEARCH_TIMEOUT_SECONDS=8
+JOB_SEARCH_RESULT_LIMIT=12
+```
 
 Local setup:
 
@@ -57,70 +109,87 @@ cp .env.example .env
 
 Then fill `.env` locally. The `.gitignore` file prevents `.env` from being committed.
 
----
+## Running Locally
 
-## 🛠️ Tech Stack
+With Docker:
+
+```bash
+docker compose up --build app
+```
+
+Then open:
+
+```text
+http://127.0.0.1:5000
+```
+
+Metrics:
+
+```text
+http://127.0.0.1:5000/metrics
+```
+
+## Testing
+
+If Python and dependencies are installed locally:
+
+```bash
+python -m pytest
+```
+
+Inside Docker:
+
+```bash
+docker compose exec app python -m pytest
+```
+
+If `pytest` is not installed in the image, rebuild after dependency updates:
+
+```bash
+docker compose up --build app
+```
+
+## Tech Stack
 
 | Category | Technologies |
 |----------|--------------|
-| **Backend** | Python 3.10+, Flask |
-| **Frontend** | HTML5, CSS3, Bootstrap 5, Font Awesome |
-| **PDF Processing** | PyPDF2, pdfplumber |
-| **Containerization** | Docker, Docker Compose |
-| **Monitoring** | Prometheus, Grafana |
-| **CI/CD** | GitHub Actions |
-| **Deployment** | Render.com |
+| Backend | Python, Flask |
+| Frontend | HTML, CSS, Bootstrap 5, Font Awesome |
+| PDF Processing | PyPDF2, pdfplumber |
+| Job Discovery | requests, BeautifulSoup, provider adapters |
+| Optional AI | OpenAI Python SDK |
+| Monitoring | Prometheus, Grafana |
+| Containerization | Docker, Docker Compose |
 
----
+## Project Structure
 
-## 📂 Project Structure 
-```
+```text
 resume_analyzer_monitoring/
 ├── app/
-│ ├── static/
-│ │ └── css/
-│ │ └── styles.css
-│ ├── templates/
-│ │ └── index.html
-│ ├── analyzer.py
-│ └── app.py
+│   ├── static/
+│   │   └── styles.css
+│   ├── templates/
+│   │   └── index.html
+│   ├── ai_agent.py
+│   ├── analyzer.py
+│   ├── app.py
+│   └── job_search.py
 ├── prometheus/
-│ └── prometheus.yml
+│   └── prometheus.yml
 ├── tests/
+│   ├── conftest.py
+│   └── test_analyzer.py
 ├── .dockerignore
 ├── .env.example
+├── .gitignore
 ├── docker-compose.yml
 ├── Dockerfile
 ├── requirements.txt
-├── CHANGELOG.md
 └── README.md
 ```
 
-## 🚀 Deployment
-This app is currently deployed on Render.com with automatic deployments from the main branch.
+## Deployment Notes
 
-Live URL: https://projects-h5c3.onrender.com/
-
-## Alternative Deployment Options
-- AWS ECS Fargate – Serverless container orchestration
-- AWS EC2 – Full control, Linux/Docker environment
-- Docker Hub – Container registry for any cloud platform
-
-## 🔮 Roadmap
-See [TODO.md] () for planned features and improvements, including:
-
-- DOCX file support
-- Analysis history
-- Export as PDF
-- User accounts
-- NLP-based skill matching
-- ATS compatibility checking
-
-## 🙏 Acknowledgments
-- Flask – Web framework
-- Bootstrap – UI framework
-- PyPDF2 – PDF parsing
-- pdfplumber – Advanced PDF extraction
-- Prometheus – Metrics
-- Grafana – Visualization
-- Render.com – Hosting
+- Store `SECRET_KEY`, `OPENAI_API_KEY`, and provider API keys in deployment environment variables or GitHub Secrets.
+- Keep `CAREER_SITES_RESPECT_ROBOTS=true` unless you have explicit permission to crawl a site differently.
+- Keep `JOB_SEARCH_DATE_FILTER_ENABLED=false` while tuning career-site coverage; enable it later if you want strict recency.
