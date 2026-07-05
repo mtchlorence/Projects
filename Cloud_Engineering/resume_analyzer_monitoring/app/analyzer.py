@@ -4,10 +4,11 @@ import pdfplumber
 from typing import Optional, Dict, List, Tuple
 
 SKILLS = [
-    "python", "sql", "aws", "lambda", "s3", "docker", 
+    "python", "sql", "aws", "cloud", "cloud engineering",
+    "devops", "lambda", "s3", "docker", "serverless",
     "kubernetes", "terraform", "linux", "git", "jenkins",
-    "cloudwatch", "prometheus", "grafana", "power bi",
-    "athena", "glue", "api", "ci/cd", "ansible",
+    "cloudwatch", "monitoring", "prometheus", "grafana", "power bi",
+    "athena", "glue", "etl", "api", "ci/cd", "ansible",
     "jenkins", "azure", "gcp", "react", "angular",
     "node.js", "typescript", "javascript", "java", "c++",
     "postgresql", "mysql", "mongodb", "redis"
@@ -61,7 +62,7 @@ def extract_text_from_pdf(file_bytes: bytes, method: str = "pdfplumber") -> str:
 
 # ----- Analysis Functions -----
 
-def analyze_resume_text(resume_text: str, job_description: str) -> Dict:
+def analyze_resume_text(resume_text: str, job_description: str = "") -> Dict:
     """
     Analyze resume text against job description.
     
@@ -105,12 +106,13 @@ def analyze_resume_text(resume_text: str, job_description: str) -> Dict:
         "matched_skills": sorted(matched_skills),
         "missing_skills": sorted(missing_skills),
         "job_skills": sorted(job_skills),
-        "resume_skills": sorted(resume_skills)
+        "resume_skills": sorted(resume_skills),
+        "resume_text": resume_text,
     }
 
 def analyze_resume(
     resume_source: str, 
-    job_description: str,
+    job_description: str = "",
     is_file: bool = False,
     file_bytes: Optional[bytes] = None
 ) -> Dict:
