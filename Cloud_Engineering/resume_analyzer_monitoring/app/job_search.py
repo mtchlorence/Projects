@@ -607,6 +607,63 @@ def fetch_jobs(queries: Iterable[str]) -> List[Dict]:
     return _dedupe_jobs(jobs)
 
 
+def filter_jobs_for_target_roles(
+    jobs: Iterable[Dict],
+    resume_guidance: Optional[Dict] = None,
+    candidate_profile: Optional[Dict] = None,
+) -> List[Dict]:
+    jobs = list(jobs)
+    if not jobs:
+        return []
+
+    role_titles = []
+    if isinstance(resume_guidance, dict):
+        for role in resume_guidance.get("recommended_roles", []) or []:
+            if isinstance(role, dict):
+                title = str(role.get("title", "")).strip()
+                if title:
+                    role_titles.append(title)
+
+    if isinstance(candidate_profile, dict):
+        for title in candidate_profile.get("target_titles", []) or []:
+            title = str(title).strip()
+            if title:
+                role_titles.append(title)
+
+    if not role_titles:
+        return jobs
+
+    role_terms = []
+    for title in role_titles:
+        tokens = [token for token in re.findall(r"[a-z0-9]+", title.lower()) if len(token) >= 2]
+        if tokens:
+            role_terms.append(set(tokens))
+
+    if not role_terms:
+        return jobs
+
+    filtered_jobs = []
+    for job in jobs:
+        job_text = " ".join(
+            str(value)
+            for value in (
+                job.get("title", ""),
+                job.get("company", ""),
+                job.get("location", ""),
+                job.get("match_reason", ""),
+            )
+        ).lower()
+
+        if any(
+            (len(term_tokens) >= 2 and term_tokens.issubset(set(job_text.split())))
+            or (len(term_tokens) == 1 and next(iter(term_tokens)) in job_text)
+            for term_tokens in role_terms
+        ):
+            filtered_jobs.append(job)
+
+    return filtered_jobs if filtered_jobs else jobs
+
+
 def filter_and_rank_jobs(
     jobs: Iterable[Dict],
     resume_skills: Iterable[str],

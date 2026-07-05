@@ -7,7 +7,7 @@ from prometheus_client import CONTENT_TYPE_LATEST, Counter, Histogram, generate_
 
 from ai_agent import build_resume_guidance
 from analyzer import analyze_resume
-from job_search import find_matching_jobs
+from job_search import filter_jobs_for_target_roles, find_matching_jobs
 
 
 load_dotenv()
@@ -70,13 +70,18 @@ def analyze():
             results.get("resume_skills", []),
             job_matches.get("candidate_profile", {}),
         )
+        display_jobs = filter_jobs_for_target_roles(
+            job_matches.get("jobs", []),
+            resume_guidance,
+            job_matches.get("candidate_profile", {}),
+        )
         ANALYSIS_SUCCESS.inc()
 
         return render_template(
             "index.html",
             results=results,
             resume_guidance=resume_guidance,
-            job_matches=job_matches.get("jobs", []),
+            job_matches=display_jobs,
             job_search_error=job_matches.get("error"),
             analyzed=True,
         )

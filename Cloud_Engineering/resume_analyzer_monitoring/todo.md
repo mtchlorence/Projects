@@ -1,1 +1,2 @@
-- The job postings in the Jobs I should apply for section should be the list of jobs that are in the jobs I should target section. 
+[] The job postings in the *Jobs I should apply for* section should reference the list of jobs that are in the *Jobs I should target section*.
+[] Improve scraping capability using OpenAI or other public APIs 

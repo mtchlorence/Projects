@@ -11,6 +11,7 @@ from job_search import (
     fetch_company_site_jobs,
     fetch_jsearch_jobs,
     filter_and_rank_jobs,
+    filter_jobs_for_target_roles,
 )
 
 def test_analyze_resume_perfect_match():
@@ -184,8 +185,23 @@ def test_build_search_queries_includes_ai_and_ph_queries():
     queries = _build_search_queries(["python", "aws"], profile)
 
     assert "cloud engineer philippines" in queries
+    assert "devops engineer philippines" in queries
     assert "python philippines" in queries
     assert "manila" in queries
+
+def test_filter_jobs_for_target_roles_matches_recommended_roles():
+    jobs = [
+        {"title": "Cloud Engineer", "company": "Example", "location": "Manila", "match_reason": ""},
+        {"title": "Data Analyst", "company": "Example", "location": "Manila", "match_reason": ""},
+    ]
+
+    filtered_jobs = filter_jobs_for_target_roles(
+        jobs,
+        {"recommended_roles": [{"title": "Cloud Engineer", "why": "Good fit"}]},
+        {},
+    )
+
+    assert [job["title"] for job in filtered_jobs] == ["Cloud Engineer"]
 
 def test_normalize_jsearch_job_maps_ph_location_and_skills():
     job = _normalize_jsearch_job(
