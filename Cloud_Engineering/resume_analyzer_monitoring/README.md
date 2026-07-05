@@ -21,11 +21,18 @@ Upload a PDF resume or paste text, add a job description, and get instant feedba
 - **📄 PDF Resume Upload** - Drag-and-drop or click to upload PDF files
 - **📝 Text Input Option** - Paste resume text directly
 - **🔍 Skill Matching** - Compares your skills against job requirements
+- **💼 Live Job Matching** - Finds active Remote OK postings from the last 30 days that match your resume skills
 - **📊 Match Score** - Visual percentage score with color-coded feedback
 - **✅ Matched Skills** - See which skills you already have
 - **❌ Missing Skills** - Identify skill gaps to focus on
 - **💡 Recommendations** - Actionable advice based on your match score
 - **📱 Responsive UI** - Works on desktop, tablet, and mobile
+
+---
+
+### Job Matching
+
+When you upload a resume or paste resume text, the app extracts known skills from your resume, searches Remote OK for matching roles, filters out postings older than 30 days, and ranks the remaining jobs by skill overlap. Set `JOB_SEARCH_ENABLED=false` to disable live job matching in local or offline environments.
 
 ---
 
@@ -94,4 +101,3 @@ See [TODO.md] () for planned features and improvements, including:
 - Prometheus – Metrics
 - Grafana – Visualization
 - Render.com – Hosting
-

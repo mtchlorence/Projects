@@ -440,6 +440,100 @@
             font-weight: 700;
         }
 
+        /* ===== Job Matches ===== */
+        .job-count {
+            align-self: flex-start;
+            background: #ecfeff;
+            border: 1px solid #a5f3fc;
+            border-radius: 999px;
+            color: #155e75;
+            font-size: 0.85rem;
+            font-weight: 700;
+            padding: 0.45rem 0.9rem;
+            white-space: nowrap;
+        }
+
+        .job-list {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .job-card {
+            align-items: flex-start;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            display: flex;
+            gap: 1rem;
+            justify-content: space-between;
+            padding: 1.2rem;
+        }
+
+        .job-card-main {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .job-title-row {
+            align-items: flex-start;
+            display: flex;
+            gap: 0.8rem;
+            justify-content: space-between;
+        }
+
+        .job-title-row h6 {
+            color: #0f172a;
+            font-size: 1rem;
+            font-weight: 800;
+            margin: 0;
+        }
+
+        .job-title-row span {
+            background: #dcfce7;
+            border-radius: 999px;
+            color: #166534;
+            font-size: 0.8rem;
+            font-weight: 800;
+            padding: 0.35rem 0.7rem;
+            white-space: nowrap;
+        }
+
+        .job-meta {
+            color: #64748b;
+            display: flex;
+            flex-wrap: wrap;
+            font-size: 0.85rem;
+            gap: 0.5rem 1rem;
+            margin: 0.7rem 0 0.9rem;
+        }
+
+        .job-meta i {
+            color: #2563eb;
+            margin-right: 0.25rem;
+        }
+
+        .job-skills li {
+            font-size: 0.78rem;
+            padding: 0.32rem 0.8rem;
+        }
+
+        .job-link {
+            background: #0f172a;
+            border-radius: 999px;
+            color: #ffffff;
+            flex: 0 0 auto;
+            font-size: 0.85rem;
+            font-weight: 700;
+            padding: 0.7rem 1rem;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .job-link:hover {
+            background: #2563eb;
+            color: #ffffff;
+        }
+
         /* ===== Error Alert ===== */
         .alert-error {
             background: #fef2f2;
@@ -528,6 +622,16 @@
             .upload-area {
                 padding: 1.5rem 1rem;
             }
+
+            .job-card,
+            .job-title-row {
+                flex-direction: column;
+            }
+
+            .job-title-row span,
+            .job-link {
+                white-space: normal;
+            }
         }
 
         @media (max-width: 576px) {
@@ -568,8 +672,8 @@
                 </h1>
 
                 <p class="hero-subtitle">
-                    Upload your resume (PDF) or paste text, then compare against a job description
-                    to identify matched skills, detect gaps, and get a fit recommendation.
+                    Upload your resume (PDF) or paste text to analyze your skills, then discover
+                    matching active job postings from the last 30 days.
                 </p>
             </section>
 
@@ -643,10 +747,11 @@
                                 </div>
                             </div>
 
-                            <!-- Job Description -->
+                            <!-- Optional Job Description -->
                             <div class="col-lg-6">
                                 <label for="job_description" class="form-label fw-semibold">
                                     <i class="fas fa-briefcase me-1"></i> Job Description
+                                    <span class="text-muted fw-normal">(optional)</span>
                                 </label>
 
                                 <textarea
@@ -654,7 +759,7 @@
                                     id="job_description"
                                     name="job_description"
                                     rows="10"
-                                    placeholder="Paste the job description here..."
+                                    placeholder="Paste a specific job description here if you want a fit score for one role. Leave blank to only search live matching jobs."
                                     maxlength="5000"
                                 >{{ job_description if job_description else '' }}</textarea>
 
@@ -669,7 +774,7 @@
                         <div class="text-center mt-4">
                             <button type="submit" class="btn analyze-btn" id="analyzeBtn">
                                 <span class="btn-text">
-                                    <i class="fas fa-chart-line"></i> Analyze Resume
+                                    <i class="fas fa-chart-line"></i> Analyze Resume + Find Jobs
                                 </span>
                                 <span class="btn-spinner">
                                     <i class="fas fa-spinner fa-spin"></i> Analyzing...
@@ -779,7 +884,9 @@
                     <i class="fas fa-lightbulb"></i>
                     <strong>Recommendation:</strong>
 
-                    {% if score >= 80 %}
+                    {% if not results.job_skills %}
+                        Add a specific job description if you want a role-by-role fit score. Your resume skills are still being used to find fresh matching postings below.
+                    {% elif score >= 80 %}
                         Your skills align very well with this role. You're a strong candidate — proceed with confidence!
                     {% elif score >= 60 %}
                         You have a solid foundation. Focus on the missing skills above to strengthen your profile before applying.
@@ -788,6 +895,70 @@
                     {% endif %}
                 </section>
 
+            {% endif %}
+
+            <!-- ===== MATCHING JOBS SECTION ===== -->
+            {% if job_matches is defined or job_search_error %}
+                <section class="card app-card shadow-sm mt-4">
+                    <div class="card-body p-4 p-lg-5">
+                        <div class="d-flex flex-column flex-md-row justify-content-between gap-3 mb-4">
+                            <div>
+                                <h5 class="mb-1 fw-bold">
+                                    <i class="fas fa-search me-2"></i> Active Job Matches
+                                </h5>
+                                <p class="text-muted mb-0">
+                                    Ranked by your resume skills and limited to postings from the last 30 days.
+                                </p>
+                            </div>
+                            <span class="job-count">
+                                {{ job_matches|length if job_matches else 0 }} found
+                            </span>
+                        </div>
+
+                        {% if job_search_error %}
+                            <div class="alert-error mb-4">
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                                {{ job_search_error }}
+                            </div>
+                        {% endif %}
+
+                        {% if job_matches %}
+                            <div class="job-list">
+                                {% for job in job_matches %}
+                                    <article class="job-card">
+                                        <div class="job-card-main">
+                                            <div class="job-title-row">
+                                                <h6>{{ job.title }}</h6>
+                                                <span>{{ job.match_score }}% skill match</span>
+                                            </div>
+                                            <div class="job-meta">
+                                                <span><i class="fas fa-building"></i> {{ job.company }}</span>
+                                                <span><i class="fas fa-location-dot"></i> {{ job.location }}</span>
+                                                <span><i class="fas fa-calendar-days"></i> Posted {{ job.posted_at }}</span>
+                                                <span><i class="fas fa-database"></i> {{ job.source }}</span>
+                                            </div>
+                                            <ul class="skill-list job-skills">
+                                                {% for skill in job.matched_skills %}
+                                                    <li class="matched">{{ skill }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                        {% if job.url %}
+                                            <a class="job-link" href="{{ job.url }}" target="_blank" rel="noopener noreferrer">
+                                                View Job <i class="fas fa-arrow-up-right-from-square"></i>
+                                            </a>
+                                        {% endif %}
+                                    </article>
+                                {% endfor %}
+                            </div>
+                        {% elif not job_search_error and results %}
+                            <p class="empty-skills-message mb-0">
+                                <i class="fas fa-info-circle"></i>
+                                No active job matches found for the extracted resume skills.
+                            </p>
+                        {% endif %}
+                    </div>
+                </section>
             {% endif %}
 
             <!-- ===== FOOTER ===== -->
