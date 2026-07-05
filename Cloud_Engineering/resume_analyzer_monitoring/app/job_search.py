@@ -10,10 +10,30 @@ import requests
 from analyzer import SKILLS
 
 
-REMOTEOK_API_URL = "https://remoteok.com/remote-{query}-jobs.json"
-DEFAULT_LOOKBACK_DAYS = 30
-DEFAULT_TIMEOUT_SECONDS = 8
-DEFAULT_LIMIT = 12
+def _get_env_int(name: str, fallback: int) -> int:
+    try:
+        return int(os.getenv(name, fallback))
+    except (TypeError, ValueError):
+        return fallback
+
+
+def _get_job_search_api_url() -> str:
+    api_url = os.getenv("JOB_SEARCH_API_URL")
+    if not api_url:
+        raise ValueError("JOB_SEARCH_API_URL is not configured")
+    return api_url
+
+
+def _get_lookback_days() -> int:
+    return _get_env_int("JOB_SEARCH_LOOKBACK_DAYS", 30)
+
+
+def _get_timeout_seconds() -> int:
+    return _get_env_int("JOB_SEARCH_TIMEOUT_SECONDS", 8)
+
+
+def _get_result_limit() -> int:
+    return _get_env_int("JOB_SEARCH_RESULT_LIMIT", 12)
 
 
 def _parse_posted_date(value: Optional[str]) -> Optional[datetime]:
@@ -86,11 +106,13 @@ def _dedupe_jobs(jobs: Iterable[Dict]) -> List[Dict]:
 def filter_and_rank_jobs(
     jobs: Iterable[Dict],
     resume_skills: Iterable[str],
-    lookback_days: int = DEFAULT_LOOKBACK_DAYS,
-    limit: int = DEFAULT_LIMIT,
+    lookback_days: Optional[int] = None,
+    limit: Optional[int] = None,
     now: Optional[datetime] = None,
 ) -> List[Dict]:
     now = now or datetime.now(timezone.utc)
+    lookback_days = lookback_days if lookback_days is not None else _get_lookback_days()
+    limit = limit if limit is not None else _get_result_limit()
     cutoff = now - timedelta(days=lookback_days)
     resume_skill_set = {skill.lower() for skill in resume_skills}
     ranked_jobs = []
@@ -130,8 +152,10 @@ def filter_and_rank_jobs(
     return ranked_jobs[:limit]
 
 
-def fetch_remoteok_jobs(skills: Iterable[str], timeout: int = DEFAULT_TIMEOUT_SECONDS) -> List[Dict]:
+def fetch_remoteok_jobs(skills: Iterable[str], timeout: Optional[int] = None) -> List[Dict]:
     query_terms = list(skills)[:4] or ["python"]
+    timeout = timeout if timeout is not None else _get_timeout_seconds()
+    api_url = _get_job_search_api_url()
     jobs = []
     headers = {
         "User-Agent": "resume-analyzer-monitoring/1.0 (+https://github.com/)",
@@ -140,7 +164,7 @@ def fetch_remoteok_jobs(skills: Iterable[str], timeout: int = DEFAULT_TIMEOUT_SE
 
     for skill in query_terms:
         response = requests.get(
-            REMOTEOK_API_URL.format(query=quote_plus(skill)),
+            api_url.format(query=quote_plus(skill)),
             headers=headers,
             timeout=timeout,
         )
@@ -159,8 +183,8 @@ def fetch_remoteok_jobs(skills: Iterable[str], timeout: int = DEFAULT_TIMEOUT_SE
 
 def find_matching_jobs(
     resume_skills: Iterable[str],
-    lookback_days: int = DEFAULT_LOOKBACK_DAYS,
-    limit: int = DEFAULT_LIMIT,
+    lookback_days: Optional[int] = None,
+    limit: Optional[int] = None,
 ) -> Dict:
     if os.getenv("JOB_SEARCH_ENABLED", "true").lower() in {"0", "false", "no"}:
         return {

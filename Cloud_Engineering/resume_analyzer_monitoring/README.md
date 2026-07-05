@@ -36,6 +36,29 @@ When you upload a resume or paste resume text, the app extracts known skills fro
 
 ---
 
+### Environment Variables and Secrets
+
+Commit `.env.example` only. Keep real values in a local `.env` file, Render environment variables, or GitHub Actions repository secrets.
+
+Recommended GitHub Secrets:
+
+- `SECRET_KEY`
+- `JOB_SEARCH_ENABLED`
+- `JOB_SEARCH_API_URL`
+- `JOB_SEARCH_LOOKBACK_DAYS`
+- `JOB_SEARCH_TIMEOUT_SECONDS`
+- `JOB_SEARCH_RESULT_LIMIT`
+
+Local setup:
+
+```bash
+cp .env.example .env
+```
+
+Then fill `.env` locally. The `.gitignore` file prevents `.env` from being committed.
+
+---
+
 ## 🛠️ Tech Stack
 
 | Category | Technologies |

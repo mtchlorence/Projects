@@ -152,10 +152,13 @@ import time
 import os
 from analyzer import analyze_resume
 from job_search import find_matching_jobs
+from dotenv import load_dotenv
 from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST
 
+load_dotenv()
+
 app = Flask(__name__)
-app.secret_key = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
+app.secret_key = os.getenv('SECRET_KEY') or 'dev-secret-key-change-in-production'
 app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024
 
 # Prometheus Metrics
