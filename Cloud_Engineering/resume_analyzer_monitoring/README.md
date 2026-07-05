@@ -21,11 +21,41 @@ Upload a PDF resume or paste text, add a job description, and get instant feedba
 - **📄 PDF Resume Upload** - Drag-and-drop or click to upload PDF files
 - **📝 Text Input Option** - Paste resume text directly
 - **🔍 Skill Matching** - Compares your skills against job requirements
+- **💼 Live Job Matching** - Finds active Remote OK postings from the last 30 days that match your resume skills
 - **📊 Match Score** - Visual percentage score with color-coded feedback
 - **✅ Matched Skills** - See which skills you already have
 - **❌ Missing Skills** - Identify skill gaps to focus on
 - **💡 Recommendations** - Actionable advice based on your match score
 - **📱 Responsive UI** - Works on desktop, tablet, and mobile
+
+---
+
+### Job Matching
+
+When you upload a resume or paste resume text, the app extracts known skills from your resume, searches Remote OK for matching roles, filters out postings older than 30 days, and ranks the remaining jobs by skill overlap. Set `JOB_SEARCH_ENABLED=false` to disable live job matching in local or offline environments.
+
+---
+
+### Environment Variables and Secrets
+
+Commit `.env.example` only. Keep real values in a local `.env` file, Render environment variables, or GitHub Actions repository secrets.
+
+Recommended GitHub Secrets:
+
+- `SECRET_KEY`
+- `JOB_SEARCH_ENABLED`
+- `JOB_SEARCH_API_URL`
+- `JOB_SEARCH_LOOKBACK_DAYS`
+- `JOB_SEARCH_TIMEOUT_SECONDS`
+- `JOB_SEARCH_RESULT_LIMIT`
+
+Local setup:
+
+```bash
+cp .env.example .env
+```
+
+Then fill `.env` locally. The `.gitignore` file prevents `.env` from being committed.
 
 ---
 
@@ -94,4 +124,3 @@ See [TODO.md] () for planned features and improvements, including:
 - Prometheus – Metrics
 - Grafana – Visualization
 - Render.com – Hosting
-

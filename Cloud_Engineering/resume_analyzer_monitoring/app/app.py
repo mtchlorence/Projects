@@ -151,16 +151,22 @@ from flask import Flask, render_template, request, session
 import time
 import os
 from analyzer import analyze_resume
+from job_search import find_matching_jobs
+from dotenv import load_dotenv
 from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST
 
+load_dotenv()
+
 app = Flask(__name__)
-app.secret_key = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
+app.secret_key = os.getenv('SECRET_KEY') or 'dev-secret-key-change-in-production'
+app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024
 
 # Prometheus Metrics
 ANALYSIS_TOTAL = Counter("resume_analysis_total", "Total number of resume analyses performed")
 ANALYSIS_SUCCESS = Counter("resume_analysis_success_total", "Total number of successful resume analyses")
 ANALYSIS_FAILED = Counter("resume_analysis_failed_total", "Total number of failed resume analyses")
 ANALYSIS_DURATION = Histogram("resume_analysis_duration_seconds", "Time spent processing resume analysis")
+JOB_MATCH_TOTAL = Counter("resume_job_match_total", "Total number of resume-based job searches performed")
 
 @app.route("/")
 def home():
@@ -214,11 +220,15 @@ def analyze():
                 )
                 resume_filename = None
 
+        JOB_MATCH_TOTAL.inc()
+        job_matches = find_matching_jobs(results.get("resume_skills", []))
         ANALYSIS_SUCCESS.inc()
 
         return render_template(
             "index.html",
             results=results,
+            job_matches=job_matches.get("jobs", []),
+            job_search_error=job_matches.get("error"),
             resume=resume_text,
             job_description=job_description,
             resume_filename=resume_filename
