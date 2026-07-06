@@ -36,16 +36,16 @@ def detect_experience_level(resume_text: str) -> Dict:
     year_values = []
 
     year_patterns = [
-        r"(\d+)\+?\s*(?:years|yrs|year)\s+(?:of\s+)?(?:experience|exp)",
-        r"(?:experience|exp)\s+(?:of\s+)?(\d+)\+?\s*(?:years|yrs|year)",
+        r"\b(\d+)\+?\s*(?:years|yrs|year)\b",
+        r"\b(?:experience|exp)\s+(?:of\s+)?(\d+)\+?\s*(?:years|yrs|year)\b",
     ]
     for pattern in year_patterns:
         for match in re.findall(pattern, text):
             year_values.append(int(match))
 
     if year_values:
-        years = max(year_values)
-        signals.append(f"{years}+ years" if f"{years}+" in text else f"{years} years")
+        years = sum(year_values)
+        signals.append(f"{years} years total")
         if years >= 5:
             level = "senior"
         elif years >= 3:

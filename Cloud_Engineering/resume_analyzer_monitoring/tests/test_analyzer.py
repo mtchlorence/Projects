@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta, timezone
 
 from ai_agent import build_resume_guidance
-from analyzer import analyze_resume
+from analyzer import analyze_resume, detect_experience_level
 from job_search import (
     _build_search_queries,
     _extract_company_jobs_from_page,
@@ -52,6 +52,15 @@ def test_analyze_resume_detects_non_technical_categories_and_experience():
     assert "veterinarian" in result["resume_skills"]
     assert "animal care" in result["resume_skills"]
     assert result["experience_level"]["level"] == "mid"
+
+
+def test_detect_experience_level_sums_multiple_experience_mentions():
+    result = detect_experience_level(
+        "Worked 2 years in backend development. Then 3 years in cloud engineering and DevOps."
+    )
+
+    assert result["level"] == "senior"
+
 
 def test_build_resume_guidance_fallback_answers_resume_questions(monkeypatch):
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)

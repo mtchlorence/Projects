@@ -223,8 +223,7 @@ body {
     text-align: right;
 }
 
-.analyze-btn,
-.analyze-again-btn {
+.analyze-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -241,10 +240,39 @@ body {
     transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
 }
 
-.analyze-btn:hover,
-.analyze-again-btn:hover {
+.analyze-btn:hover {
     background: #1d4ed8;
     box-shadow: 0 10px 24px rgba(37, 99, 235, 0.22);
+    color: #ffffff;
+    transform: translateY(-1px);
+}
+
+.result-actions {
+    display: flex;
+    justify-content: center;
+    margin: 1.5rem 0 0.25rem;
+}
+
+.analyze-again-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    min-height: 40px;
+    padding: 0.6rem 1.1rem;
+    border-radius: 999px;
+    background: #2563eb;
+    color: #ffffff;
+    font-size: 0.9rem;
+    font-weight: 800;
+    line-height: 1;
+    text-decoration: none;
+    transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+
+.analyze-again-btn:hover {
+    background: #1d4ed8;
+    box-shadow: 0 8px 18px rgba(37, 99, 235, 0.18);
     color: #ffffff;
     transform: translateY(-1px);
 }
@@ -571,8 +599,7 @@ body {
         min-height: 160px;
     }
 
-    .analyze-btn,
-    .analyze-again-btn {
+    .analyze-btn {
         width: 100%;
     }
 
