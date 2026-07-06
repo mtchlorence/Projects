@@ -68,12 +68,18 @@ def analyze():
         resume_guidance = build_resume_guidance(
             results.get("resume_text", ""),
             results.get("resume_skills", []),
-            job_matches.get("candidate_profile", {}),
+            {
+                **job_matches.get("candidate_profile", {}),
+                "experience_level": results.get("experience_level", {}).get("level", ""),
+            },
         )
         display_jobs = filter_jobs_for_target_roles(
             job_matches.get("jobs", []),
             resume_guidance,
-            job_matches.get("candidate_profile", {}),
+            {
+                **job_matches.get("candidate_profile", {}),
+                "experience_level": results.get("experience_level", {}).get("level", ""),
+            },
         )
         ANALYSIS_SUCCESS.inc()
 

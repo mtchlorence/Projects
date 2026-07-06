@@ -8,6 +8,7 @@ from job_search import (
     _is_ph_based,
     _normalize_jsearch_job,
     _passes_relevance_filter,
+    _title_similarity,
     fetch_company_site_jobs,
     fetch_jsearch_jobs,
     filter_and_rank_jobs,
@@ -42,6 +43,15 @@ def test_analyze_resume_detects_cloud_terms():
     assert "cloud" in result["resume_skills"]
     assert "cloud engineering" in result["resume_skills"]
     assert "devops" in result["resume_skills"]
+
+def test_analyze_resume_detects_non_technical_categories_and_experience():
+    result = analyze_resume(
+        "Licensed veterinarian with 4 years of experience in animal care, diagnosis, and clinical documentation."
+    )
+
+    assert "veterinarian" in result["resume_skills"]
+    assert "animal care" in result["resume_skills"]
+    assert result["experience_level"]["level"] == "mid"
 
 def test_build_resume_guidance_fallback_answers_resume_questions(monkeypatch):
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
@@ -208,6 +218,13 @@ def test_build_search_queries_includes_ai_and_ph_queries():
     assert "python philippines" in queries
     assert "manila" in queries
 
+def test_build_search_queries_follow_non_technical_resume_category():
+    queries = _build_search_queries(["veterinarian", "animal care", "clinical"], {})
+
+    assert "veterinarian philippines" in queries
+    assert "veterinary associate philippines" in queries
+    assert "cloud engineer philippines" not in queries
+
 def test_filter_jobs_for_target_roles_matches_recommended_roles():
     jobs = [
         {"title": "Cloud Engineer", "company": "Example", "location": "Manila", "match_reason": ""},
@@ -221,6 +238,29 @@ def test_filter_jobs_for_target_roles_matches_recommended_roles():
     )
 
     assert [job["title"] for job in filtered_jobs] == ["Cloud Engineer"]
+
+def test_title_similarity_supports_related_job_titles():
+    assert _title_similarity("Architectural Designer", "Architect / Architectural Designer") >= 0.42
+    assert _title_similarity("Veterinary Associate", "Veterinarian / Veterinary Associate") >= 0.42
+
+def test_filter_jobs_for_target_roles_uses_similarity_and_experience():
+    jobs = [
+        {"title": "Architectural Designer", "company": "Studio", "location": "Makati", "matched_skills": ["revit"]},
+        {"title": "Senior Architect", "company": "Studio", "location": "Makati", "matched_skills": ["revit"]},
+        {"title": "Cloud Engineer", "company": "Cloud", "location": "Manila", "matched_skills": ["aws"]},
+    ]
+
+    filtered_jobs = filter_jobs_for_target_roles(
+        jobs,
+        {
+            "experience_level": "junior",
+            "recommended_roles": [{"title": "Architect / Architectural Designer", "why": "Design fit"}],
+        },
+        {},
+    )
+
+    assert [job["title"] for job in filtered_jobs] == ["Architectural Designer"]
+    assert filtered_jobs[0]["target_role"] == "Architect / Architectural Designer"
 
 def test_normalize_jsearch_job_maps_ph_location_and_skills():
     job = _normalize_jsearch_job(

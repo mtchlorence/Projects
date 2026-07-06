@@ -11,8 +11,10 @@ A Flask portfolio app that accepts a resume, extracts skills, and discovers Phil
 - PDF resume upload with drag-and-drop support
 - Resume text paste fallback
 - PDF text extraction with `pdfplumber`
-- Skill extraction from a configurable skill list
+- Skill extraction from a configurable skill list, including technical and selected non-technical categories
+- Experience-level detection for entry, junior, mid-level, and senior resumes
 - Philippines-only job filtering
+- Target-role-aware job filtering with job title similarity
 - Optional AI-assisted search-query generation and job match explanations
 - Configurable job providers:
   - Public company career sites from `CAREER_SITE_URLS`
@@ -25,13 +27,13 @@ A Flask portfolio app that accepts a resume, extracts skills, and discovers Phil
 ## App Flow
 
 1. User uploads a PDF resume or pastes resume text.
-2. Flask extracts resume text and known skills.
+2. Flask extracts resume text, known skills, and experience level.
 3. The optional AI layer builds better Philippines-focused job search queries.
 4. Job providers fetch candidate jobs.
 5. The app removes non-Philippines jobs.
 6. Date filtering is optional and currently off by default.
-7. Jobs are ranked by matched skills and recency.
-8. The results page shows extracted skills, job cards, and optional AI match reasons.
+7. Jobs are ranked by matched skills, recency, target-role fit, and job title similarity.
+8. The results page shows resume feedback, target roles, extracted skills, job cards, and optional AI match reasons.
 
 Uploaded files are not persisted. They are read during the request only.
 
@@ -66,6 +68,7 @@ When `OPENAI_API_KEY` is configured, `app/ai_agent.py` can:
 
 - summarize the candidate profile
 - generate better Philippines-focused search queries
+- recommend target roles and experience-level-aware search focus
 - enrich jobs with short "why this matches" explanations
 
 ## Environment Variables

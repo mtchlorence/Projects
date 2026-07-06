@@ -5,6 +5,7 @@ import os
 import re
 import urllib.robotparser
 from datetime import datetime, timedelta, timezone
+from difflib import SequenceMatcher
 from typing import Dict, Iterable, List, Optional
 from urllib.parse import quote_plus, urldefrag, urljoin, urlparse
 
@@ -52,6 +53,27 @@ GENERIC_MATCH_SKILLS = {
     "linux",
     "monitoring",
     "sql",
+}
+TITLE_STOP_WORDS = {
+    "and",
+    "associate",
+    "for",
+    "i",
+    "ii",
+    "iii",
+    "iv",
+    "junior",
+    "level",
+    "mid",
+    "of",
+    "senior",
+    "the",
+}
+EXPERIENCE_TITLE_TERMS = {
+    "entry": {"entry", "entry-level", "junior", "trainee", "intern", "associate"},
+    "junior": {"entry", "entry-level", "junior", "trainee", "associate"},
+    "mid": {"associate", "mid", "mid-level", "specialist", "officer"},
+    "senior": {"senior", "lead", "principal", "manager", "supervisor", "head"},
 }
 
 
@@ -147,6 +169,52 @@ def _passes_relevance_filter(matched_skills: Iterable[str]) -> bool:
         len(matched) >= _get_min_matched_skills()
         and len(specific_matches) >= _get_min_specific_skills()
     )
+
+
+def _title_tokens(title: str) -> set:
+    return {
+        token
+        for token in re.findall(r"[a-z0-9]+", title.lower())
+        if token not in TITLE_STOP_WORDS and len(token) >= 2
+    }
+
+
+def _title_similarity(job_title: str, target_title: str) -> float:
+    job_title = job_title.lower().strip()
+    target_title = target_title.lower().strip()
+    if not job_title or not target_title:
+        return 0.0
+
+    sequence_score = SequenceMatcher(None, job_title, target_title).ratio()
+    job_tokens = _title_tokens(job_title)
+    target_tokens = _title_tokens(target_title)
+    if not job_tokens or not target_tokens:
+        return sequence_score
+
+    token_overlap = len(job_tokens.intersection(target_tokens)) / len(target_tokens)
+    return max(sequence_score, token_overlap)
+
+
+def _experience_matches_title(job_title: str, experience_level: str) -> bool:
+    if not experience_level:
+        return True
+
+    level = str(experience_level).lower()
+    terms = EXPERIENCE_TITLE_TERMS.get(level)
+    if not terms:
+        return True
+
+    title = job_title.lower()
+    senior_terms = EXPERIENCE_TITLE_TERMS["senior"]
+    junior_terms = EXPERIENCE_TITLE_TERMS["entry"].union(EXPERIENCE_TITLE_TERMS["junior"])
+
+    if level in {"entry", "junior"}:
+        return not any(term in title for term in senior_terms)
+
+    if level == "senior":
+        return any(term in title for term in terms) or not any(term in title for term in junior_terms)
+
+    return not any(term in title for term in {"intern", "trainee"})
 
 
 def _normalize_remoteok_job(raw_job: Dict) -> Optional[Dict]:
@@ -417,15 +485,54 @@ def _dedupe_jobs(jobs: Iterable[Dict]) -> List[Dict]:
 
 def _build_search_queries(resume_skills: Iterable[str], candidate_profile: Dict) -> List[str]:
     skills = list(resume_skills)
+    skill_set = {skill.lower() for skill in skills}
     ai_queries = candidate_profile.get("search_queries", [])
     target_titles = candidate_profile.get("target_titles", [])
+    career_queries = []
+
+    if skill_set.intersection({"architecture", "architect", "autocad", "revit", "sketchup", "bim", "drafting"}):
+        career_queries.extend(
+            [
+                "architect philippines",
+                "architectural designer philippines",
+                "revit designer philippines",
+                "bim specialist philippines",
+            ]
+        )
+
+    if skill_set.intersection({"veterinarian", "veterinary", "animal care", "animal health", "clinical", "diagnosis"}):
+        career_queries.extend(
+            [
+                "veterinarian philippines",
+                "veterinary associate philippines",
+                "animal care philippines",
+                "veterinary clinic philippines",
+            ]
+        )
+
+    if skill_set.intersection({"aws", "cloud", "cloud engineering", "devops", "python", "sql", "docker"}):
+        career_queries.extend(
+            [
+                "cloud engineer philippines",
+                "devops engineer philippines",
+                "python aws philippines",
+            ]
+        )
+
+    if skill_set.intersection({"project management", "customer service", "communication", "leadership", "documentation"}):
+        career_queries.extend(
+            [
+                "project coordinator philippines",
+                "operations associate philippines",
+                "customer success philippines",
+            ]
+        )
+
     fallback_queries = [
         *skills[:5],
         *[f"{skill} philippines" for skill in skills[:4]],
         *target_titles[:4],
-        "cloud engineer philippines",
-        "devops engineer philippines",
-        "python aws philippines",
+        *career_queries,
     ]
     return list(dict.fromkeys([*ai_queries, *fallback_queries, *PH_SEARCH_TERMS]))[:14]
 
@@ -633,35 +740,58 @@ def filter_jobs_for_target_roles(
     if not role_titles:
         return jobs
 
-    role_terms = []
-    for title in role_titles:
-        tokens = [token for token in re.findall(r"[a-z0-9]+", title.lower()) if len(token) >= 2]
-        if tokens:
-            role_terms.append(set(tokens))
-
-    if not role_terms:
-        return jobs
+    experience_level = ""
+    if isinstance(resume_guidance, dict):
+        experience_level = str(resume_guidance.get("experience_level", "") or "")
+    if not experience_level and isinstance(candidate_profile, dict):
+        experience_level = str(candidate_profile.get("experience_level", "") or "")
 
     filtered_jobs = []
     for job in jobs:
-        job_text = " ".join(
-            str(value)
-            for value in (
-                job.get("title", ""),
-                job.get("company", ""),
-                job.get("location", ""),
-                job.get("match_reason", ""),
-            )
-        ).lower()
+        job_title = str(job.get("title", ""))
+        target_role, similarity = max(
+            ((role_title, _title_similarity(job_title, role_title)) for role_title in role_titles),
+            key=lambda item: item[1],
+        )
 
-        if any(
-            (len(term_tokens) >= 2 and term_tokens.issubset(set(job_text.split())))
-            or (len(term_tokens) == 1 and next(iter(term_tokens)) in job_text)
-            for term_tokens in role_terms
-        ):
-            filtered_jobs.append(job)
+        if similarity >= 0.42 and _experience_matches_title(job_title, experience_level):
+            annotated_job = {
+                **job,
+                "target_role": target_role,
+                "title_similarity": round(similarity, 3),
+            }
+            if not annotated_job.get("match_reason"):
+                annotated_job["match_reason"] = f"Matches the target role: {target_role}."
+            filtered_jobs.append(annotated_job)
 
-    return filtered_jobs if filtered_jobs else jobs
+    filtered_jobs.sort(
+        key=lambda item: (
+            item.get("title_similarity", 0),
+            len(item.get("matched_skills", [])),
+            item.get("posted_date") or datetime.min.replace(tzinfo=timezone.utc),
+        ),
+        reverse=True,
+    )
+
+    if filtered_jobs:
+        return filtered_jobs
+
+    annotated_jobs = []
+    for job in jobs:
+        job_title = str(job.get("title", ""))
+        target_role, similarity = max(
+            ((role_title, _title_similarity(job_title, role_title)) for role_title in role_titles),
+            key=lambda item: item[1],
+        )
+        annotated_jobs.append(
+            {
+                **job,
+                "target_role": target_role,
+                "title_similarity": round(similarity, 3),
+            }
+        )
+
+    return annotated_jobs
 
 
 def filter_and_rank_jobs(

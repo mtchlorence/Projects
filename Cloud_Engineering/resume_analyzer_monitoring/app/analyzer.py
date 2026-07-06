@@ -1,7 +1,8 @@
 import io
+import re
 import PyPDF2
 import pdfplumber
-from typing import Optional, Dict, List, Tuple
+from typing import Optional, Dict, List
 
 SKILLS = [
     "python", "sql", "aws", "cloud", "cloud engineering",
@@ -11,8 +12,66 @@ SKILLS = [
     "athena", "glue", "etl", "api", "ci/cd", "ansible",
     "jenkins", "azure", "gcp", "react", "angular",
     "node.js", "typescript", "javascript", "java", "c++",
-    "postgresql", "mysql", "mongodb", "redis"
+    "postgresql", "mysql", "mongodb", "redis",
+    "architecture", "architect", "autocad", "revit", "sketchup",
+    "bim", "drafting", "construction", "site planning", "urban planning",
+    "building codes", "interior design", "space planning", "3d modeling",
+    "veterinarian", "veterinary", "animal care", "animal health",
+    "clinical", "diagnosis", "surgery", "laboratory", "radiology",
+    "pharmacology", "patient care", "project management", "customer service",
+    "communication", "leadership", "research", "documentation"
 ]
+
+EXPERIENCE_LEVEL_LABELS = {
+    "entry": "Entry-level",
+    "junior": "Junior",
+    "mid": "Mid-level",
+    "senior": "Senior",
+}
+
+
+def detect_experience_level(resume_text: str) -> Dict:
+    text = resume_text.lower()
+    signals = []
+    year_values = []
+
+    year_patterns = [
+        r"(\d+)\+?\s*(?:years|yrs|year)\s+(?:of\s+)?(?:experience|exp)",
+        r"(?:experience|exp)\s+(?:of\s+)?(\d+)\+?\s*(?:years|yrs|year)",
+    ]
+    for pattern in year_patterns:
+        for match in re.findall(pattern, text):
+            year_values.append(int(match))
+
+    if year_values:
+        years = max(year_values)
+        signals.append(f"{years}+ years" if f"{years}+" in text else f"{years} years")
+        if years >= 5:
+            level = "senior"
+        elif years >= 3:
+            level = "mid"
+        elif years >= 1:
+            level = "junior"
+        else:
+            level = "entry"
+    elif re.search(r"\b(senior|lead|principal|manager|head of|supervisor)\b", text):
+        level = "senior"
+        signals.append("senior/leadership keywords")
+    elif re.search(r"\b(mid-level|mid level|intermediate|associate)\b", text):
+        level = "mid"
+        signals.append("mid-level keywords")
+    elif re.search(r"\b(junior|entry-level|entry level|intern|internship|fresh graduate|fresh grad)\b", text):
+        level = "junior"
+        signals.append("junior/entry keywords")
+    else:
+        level = "entry"
+        signals.append("no explicit experience signal")
+
+    return {
+        "level": level,
+        "label": EXPERIENCE_LEVEL_LABELS[level],
+        "signals": signals,
+    }
 
 # ----- PDF Extraction Functions -----
 
@@ -73,6 +132,8 @@ def analyze_resume_text(resume_text: str, job_description: str = "") -> Dict:
     Returns:
         Dict with score, matched_skills, missing_skills
     """
+    raw_resume_text = resume_text
+    experience_level = detect_experience_level(raw_resume_text)
     resume_text = resume_text.lower()
     job_description = job_description.lower()
 
@@ -108,6 +169,7 @@ def analyze_resume_text(resume_text: str, job_description: str = "") -> Dict:
         "job_skills": sorted(job_skills),
         "resume_skills": sorted(resume_skills),
         "resume_text": resume_text,
+        "experience_level": experience_level,
     }
 
 def analyze_resume(

@@ -10,6 +10,7 @@ DEFAULT_PROFILE = {
     "target_titles": [],
     "search_queries": [],
     "must_have_skills": [],
+    "experience_level": "",
 }
 
 
@@ -49,11 +50,35 @@ def _fallback_recommended_roles(resume_skills: Iterable[str]) -> List[Dict]:
             }
         )
 
+    if skills.intersection({"architecture", "architect", "autocad", "revit", "sketchup", "bim", "drafting"}):
+        roles.append(
+            {
+                "title": "Architect / Architectural Designer",
+                "why": "Your design, drafting, BIM, and architecture skills fit design studio or project support roles.",
+            }
+        )
+
+    if skills.intersection({"veterinarian", "veterinary", "animal care", "animal health", "clinical", "diagnosis"}):
+        roles.append(
+            {
+                "title": "Veterinarian / Veterinary Associate",
+                "why": "Your animal health, clinical, and care skills fit veterinary clinic or animal care roles.",
+            }
+        )
+
+    if skills.intersection({"project management", "customer service", "communication", "leadership", "documentation"}):
+        roles.append(
+            {
+                "title": "Operations / Project Coordinator",
+                "why": "Your coordination, communication, and documentation skills can support operations or project roles.",
+            }
+        )
+
     if not roles:
         roles.append(
             {
-                "title": "Technical Support Analyst",
-                "why": "Your resume has transferable technical skills, but the target role should be refined with more specific tools.",
+                "title": "Relevant Associate Role",
+                "why": "Your resume has transferable skills, but the target role should be refined with more specific keywords.",
             }
         )
 
@@ -138,13 +163,15 @@ Return JSON only with this schema:
   "summary": "one sentence candidate summary",
   "target_titles": ["role title", "..."],
   "search_queries": ["query", "..."],
-  "must_have_skills": ["skill", "..."]
+  "must_have_skills": ["skill", "..."],
+  "experience_level": "entry|junior|mid|senior"
 }}
 
 Rules:
 - Create 6 to 10 search queries.
 - Include Philippines location intent in every query.
 - Focus on jobs located in the Philippines, not remote-only jobs.
+- Support technical and non-technical careers, including architecture and veterinary roles.
 - Prefer concise query strings for job-board APIs.
 - Do not invent credentials, employers, degrees, or years of experience.
 
@@ -168,6 +195,7 @@ Resume text:
         "target_titles": [str(item) for item in profile.get("target_titles", [])][:8],
         "search_queries": [str(item) for item in profile.get("search_queries", [])][:10],
         "must_have_skills": [str(item).lower() for item in profile.get("must_have_skills", [])][:16],
+        "experience_level": str(profile.get("experience_level", "")),
     }
 
 
@@ -198,13 +226,15 @@ Return JSON only:
   "recommended_roles": [
     {{"title": "role title", "why": "short reason"}}
   ],
-  "job_search_focus": "one sentence strategy"
+  "job_search_focus": "one sentence strategy",
+  "experience_level": "entry|junior|mid|senior"
 }}
 
 Rules:
 - Do not flatter vaguely.
 - Do not invent employers, credentials, degrees, or years of experience.
 - Recommended roles must be realistic for the extracted skills.
+- Support technical and non-technical careers, including architecture and veterinary roles.
 - Keep strengths and improvements to 3 bullets each.
 - Keep role reasons under 20 words each.
 
@@ -242,6 +272,7 @@ Resume text:
         "improvements": [str(item) for item in guidance.get("improvements", [])][:3] or fallback["improvements"],
         "recommended_roles": recommended_roles[:4] or fallback["recommended_roles"],
         "job_search_focus": str(guidance.get("job_search_focus") or fallback["job_search_focus"]),
+        "experience_level": str(guidance.get("experience_level") or candidate_profile.get("experience_level", "")),
     }
 
 
