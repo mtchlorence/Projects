@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <title>Body Fat Calculator</title>
+    <style>
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        div#gender {
+            text-align: center;
+           
+        }
+
+        form {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        label {
+            display: inline-block;
+            width: 200px;
+            text-align: right;
+        }
+
+        input[type="number"] {
+            width: 200px;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        select {
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #4caf50;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #result {
+            text-align: center;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Body Fat Calculator</h1>
+    <div id="gender">
+            <label for="gender">Gender:</label>
+            <select id="gender" onchange="toggleInputs()">
+                <option value="female">Female</option>
+                <option value="male">Male</option>
+            </select><br><br>
+    </div>
+    <form id="bodyFatForm">
+        <label for="bodyWeight">Body Weight:</label>
+        <input type="number" id="bodyWeight" placeholder="pounds" required><br><br>
+
+        <label for="wrist">Wrist Measurement:</label>
+        <input type="number" id="wrist" placeholder="inches"><br><br>
+
+        <label for="waist">Waist Measurement:</label>
+        <input type="number" id="waist" placeholder="inches" required><br><br>
+
+        <label for="hip">Hip Measurement:</label>
+        <input type="number" id="hip" placeholder="inches"><br><br>
+
+        <label for="forearm">Forearm Measurement:</label>
+        <input type="number" id="forearm" placeholder="inches"><br><br>
+        <button type="button" onclick="calculateBodyFat()">Calculate Body Fat</button>
+    </form>
+
+
+    <div id="result"></div>
+
+    <script>
+        function toggleInputs() {
+            const gender = document.getElementById("gender").value;
+            const wristInput = document.getElementById("wrist");
+            const forearmInput = document.getElementById("forearm");
+
+            if (gender === "female") {
+                wristInput.disabled = false;
+                forearmInput.disabled = false;
+            } else {
+                wristInput.disabled = true;
+                forearmInput.disabled = true;
+                wristInput.value = "";
+                forearmInput.value = "";
+            }
+        }
+
+        function calculateBodyFat() {
+            const gender = document.getElementById("gender").value;
+            const bodyWeight = parseFloat(document.getElementById("bodyWeight").value);
+            const wrist = parseFloat(document.getElementById("wrist").value);
+            const waist = parseFloat(document.getElementById("waist").value);
+            const hip = parseFloat(document.getElementById("hip").value);
+            const forearm = parseFloat(document.getElementById("forearm").value);
+
+            let bodyFatPercentage;
+            let bodyFat;
+
+            if (gender === "female") {
+                const A1 = (bodyWeight * 0.732) + 8.987;
+                const A2 = wrist / 3.140;
+                const A3 = waist * 0.157;
+                const A4 = hip * 0.249;
+                const A5 = forearm * 0.434;
+                const B = A1 + A2 - A3 - A4 + A5;
+                bodyFat = bodyWeight - B;
+            } else {
+                const A1 = (bodyWeight * 1.082) + 94.42;
+                const A2 = wrist * 4.15;
+                const B = A1 - A2;
+                bodyFat = bodyWeight - B;
+            }
+
+            bodyFatPercentage = (bodyFat * 100) / bodyWeight;
+
+            document.getElementById("result").innerHTML = `Body Fat Percentage: ${bodyFatPercentage.toFixed(2)}%`;
+        }
+    </script>
+</body>
+
+</html>

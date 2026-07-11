@@ -1,0 +1,35 @@
+html{
+    color: white;
+}
+body {
+    font-family: Poppins, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-image: url(https://www.muddycolors.com/wp-content/uploads/2017/12/f8994-03.jpg);
+}
+
+#story-container {
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 20px;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    background-color: black;
+    opacity: 0.8;
+}
+
+.choice-button {
+    font-family: Poppins, sans-serif;
+    display: block;
+    margin-top: 10px;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #252628;
+    color: #fff;
+    cursor: pointer;
+}
+
+.choice-button:hover {
+    background-color: #ccc;
+}
