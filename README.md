@@ -27,11 +27,11 @@ Key areas:
 - Schema discovery with AWS Glue
 - SQL analytics with Amazon Athena
 
-### Resume PH Job Matcher
+### Job Curator
 
 [View project](./Cloud_Engineering/job_curator/)
 
-A Flask application that analyzes resumes, extracts skills and experience, and finds Philippines-based job opportunities that match a candidate's profile.
+A Flask application that analyzes resumes, extracts skills and experience, and finds job opportunities that match a candidate's profile.
 
 Key areas:
 
