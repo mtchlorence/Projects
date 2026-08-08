@@ -29,7 +29,7 @@ Key areas:
 
 ### Resume PH Job Matcher
 
-[View project](./Cloud_Engineering/resume_analyzer_monitoring/)
+[View project](./Cloud_Engineering/job_curator/)
 
 A Flask application that analyzes resumes, extracts skills and experience, and finds Philippines-based job opportunities that match a candidate's profile.
 
