@@ -1,4 +1,4 @@
-# Resume PH Job Matcher
+# Job Curator
 
 [![Live Demo](https://img.shields.io/badge/Live-Demo-2563eb?style=for-the-badge&logo=render&logoColor=white)](https://projects-h5c3.onrender.com/)
 [![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://hub.docker.com/r/mlorence/resume-analyzer)
@@ -163,7 +163,7 @@ docker compose up --build app
 ## Project Structure
 
 ```text
-resume_analyzer_monitoring/
+job_curator/
 ├── app/
 │   ├── static/
 │   │   └── styles.css

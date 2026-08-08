@@ -2,6 +2,6 @@ global:
   scrape_interval: 5s
 
 scrape_configs:
-  - job_name: "resume-analyzer"
+  - job_name: "job-curator"
     static_configs:
       - targets: ["host.docker.internal:5000"]

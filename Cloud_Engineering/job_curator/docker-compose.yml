@@ -1,7 +1,7 @@
 services:
   prometheus:
     image: prom/prometheus
-    container_name: resume-analyzer-prometheus
+    container_name: job-curator-prometheus
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
@@ -9,7 +9,7 @@ services:
 
   grafana:
     image: grafana/grafana
-    container_name: resume-analyzer-grafana
+    container_name: job-curator-grafana
     ports:
       - "3000:3000"
     depends_on:
@@ -19,7 +19,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: resume-analyzer-app
+    container_name: job-curator-app
     env_file:
       - path: .env
         required: false

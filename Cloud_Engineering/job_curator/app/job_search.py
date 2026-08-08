@@ -19,7 +19,7 @@ from analyzer import SKILLS
 DEFAULT_REMOTEOK_API_URL = "https://remoteok.com/remote-{query}-jobs.json"
 DEFAULT_REMOTIVE_API_URL = "https://remotive.com/api/remote-jobs?search={query}"
 DEFAULT_JSEARCH_API_URL = "https://jsearch.p.rapidapi.com/search"
-DEFAULT_USER_AGENT = "resume-analyzer-monitoring/1.0"
+DEFAULT_USER_AGENT = "job-curator/1.0"
 PH_SEARCH_TERMS = ["philippines", "philippine", "manila"]
 JOB_LINK_KEYWORDS = {
     "job",
@@ -544,7 +544,7 @@ def fetch_remoteok_jobs(
     timeout = timeout if timeout is not None else _get_timeout_seconds()
     api_url = os.getenv("REMOTEOK_JOB_API_URL", DEFAULT_REMOTEOK_API_URL)
     headers = {
-        "User-Agent": "resume-analyzer-monitoring/1.0",
+        "User-Agent": "job-curator/1.0",
         "Accept": "application/json",
     }
     jobs = []
@@ -576,7 +576,7 @@ def fetch_remotive_jobs(
     timeout = timeout if timeout is not None else _get_timeout_seconds()
     api_url = os.getenv("REMOTIVE_JOB_API_URL", DEFAULT_REMOTIVE_API_URL)
     headers = {
-        "User-Agent": "resume-analyzer-monitoring/1.0",
+        "User-Agent": "job-curator/1.0",
         "Accept": "application/json",
     }
     jobs = []
