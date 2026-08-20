@@ -7,8 +7,8 @@ DataDrift is a serverless ETL pipeline that extracts product data from the Dummy
 ## 🏗️ Architecture
 ```
 ┌─────────────┐
-│ EventBridge │ (Daily at 9 PM)
-│ (Schedule)  │
+│ Manual      │ (Invoke Extract)
+│ Trigger     │
 └───────┬─────┘
         │
         ▼
@@ -52,7 +52,7 @@ DataDrift is a serverless ETL pipeline that extracts product data from the Dummy
 
 - **Compute**: AWS Lambda (Python 3.11)
 - **Storage**: Amazon S3 (Data Lake)
-- **Orchestration**: Amazon EventBridge (Scheduled)
+- **Orchestration**: Manual Lambda invocation followed by an S3 event trigger
 - **Catalog**: AWS Glue Data Catalog
 - **Query**: Amazon Athena (Serverless SQL)
 - **IaC**: Serverless Framework

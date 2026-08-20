@@ -67,11 +67,11 @@ functions:
     handler: lambdas/extract/handler.main
     name: data-drift-extract-${self:provider.stage}
     description: Extracts product data from DummyJSON API and stores raw JSON in S3
-    events:
-      - schedule:
-          name: data-drift-daily-extract-${self:provider.stage}
-          description: Runs daily at 9 PM
-          rate: cron(0 21 * * ? *)
+    # events:
+    #   - schedule:
+    #       name: data-drift-daily-extract-${self:provider.stage}
+    #       description: Runs daily at 9 PM
+    #       rate: cron(0 21 * * ? *)
 
   transform:
     handler: lambdas/transform/handler.main
@@ -105,7 +105,8 @@ resources:
     DataDriftGlueDatabase:
       Type: AWS::Glue::Database
       Properties:
-        CatalogId: !Ref AWS::AccountId
+        CatalogId:
+          Ref: AWS::AccountId
         DatabaseInput:
           Name: data_drift_db
           Description: Database for DataDrift ETL pipeline
@@ -115,14 +116,16 @@ resources:
       Type: AWS::Glue::Crawler
       Properties:
         Name: data-drift-crawler-${self:provider.stage}
-        Role: !GetAtt GlueCrawlerRole.Arn
+        Role:
+          Fn::GetAtt:
+            - GlueCrawlerRole
+            - Arn
         DatabaseName: data_drift_db
         Description: Crawls processed CSV data for Athena queries
         Targets:
           S3Targets:
-            - Path: !Sub "s3://${self:custom.bucket_name}/processed/"
-        Schedule:
-          ScheduleExpression: cron(0 22 * * ? *)
+            - Path:
+                Fn::Sub: "s3://${self:custom.bucket_name}/processed/"
         SchemaChangePolicy:
           UpdateBehavior: UPDATE_IN_DATABASE
           DeleteBehavior: LOG
@@ -150,8 +153,8 @@ resources:
                     - s3:GetObject
                     - s3:ListBucket
                   Resource:
-                    - !Sub "arn:aws:s3:::${self:custom.bucket_name}"
-                    - !Sub "arn:aws:s3:::${self:custom.bucket_name}/processed/*"
+                    - Fn::Sub: "arn:aws:s3:::${self:custom.bucket_name}"
+                    - Fn::Sub: "arn:aws:s3:::${self:custom.bucket_name}/processed/*"
 
 plugins:
   - serverless-python-requirements
