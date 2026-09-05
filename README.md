@@ -70,13 +70,3 @@ Hands-on notebooks covering:
 
 A Jupyter-based exploration of international cost-of-living data, focused on cleaning, analysis, and communicating insights.
 
-## Skills demonstrated
-
-- Cloud architecture and serverless development
-- ETL pipeline design and data transformation
-- Python application development
-- Data analysis and machine learning
-- Monitoring, containerization, and deployment
-- Web and mobile application development
-- Git-based project organization and documentation
-
